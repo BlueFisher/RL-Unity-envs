@@ -6,7 +6,6 @@ using UnityEngine;
 namespace ObstacleRoller {
     public class RollerAcademy : Academy {
         public override void InitializeAcademy() {
-            //Monitor.SetActive(true);
         }
     }
 }

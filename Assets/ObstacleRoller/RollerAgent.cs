@@ -12,73 +12,59 @@ namespace ObstacleRoller {
 
         public Transform Target;
         public Transform Obstacle;
+        public Transform Floor;
+
+        private Vector3 convertToFloorRelativePos(Vector3 v) {
+            return new Vector3(Floor.position.x + v.x, Floor.position.y + v.y, Floor.position.z + v.z);
+        }
+        private Vector3 converToWorldRelativePos(Vector3 v) {
+            return new Vector3(v.x - Floor.position.x, v.y - Floor.position.y, v.z - Floor.position.z);
+        }
         private bool IsOutOfRegion() {
-            return transform.position.x > 5 || transform.position.x < -5 || transform.position.z > 5 || transform.position.z < -5;
+            return transform.position.x > Floor.position.x + 5 || transform.position.x < Floor.position.x - 5
+                || transform.position.z > Floor.position.z + 5 || transform.position.z < Floor.position.z - 5;
         }
-        private void GenerateTarget() {
-            while (true) {
-                var newPosition = new Vector3(Random.value * 8 - 4,
-                                                  0.5f,
-                                                  Random.value * 8 - 4);
-                if (Vector3.Distance(this.transform.position, newPosition) > 2f) {
-                    Target.position = newPosition;
-                    break;
-                }
-            }
+        private bool IsHitObstacle() {
+            float distanceToObstacle = Vector3.Distance(transform.position, Obstacle.position);
+            return distanceToObstacle < 1.1f;
         }
-        private List<int> ListRandom(List<int> myList) {
-            System.Random ran = new System.Random();
-            List<int> newList = new List<int>();
-            int index = 0;
-            int temp = 0;
-            for (int i = 0; i < myList.Count; i++) {
-                index = ran.Next(0, myList.Count - 1);
-                if (index != i) {
-                    temp = myList[i];
-                    myList[i] = myList[index];
-                    myList[index] = temp;
-                }
-            }
-            return myList;
-        }
+
+
         public override void AgentReset() {
-            if (IsOutOfRegion()) {
-                List<int> arr = new List<int> { 0, 1, 2, 3 };
-                List<Transform> transforms = new List<Transform> { transform, Obstacle, Target };
-                arr = ListRandom(arr);
-                for (int i = 0; i < transforms.Count; i++) {
-                    int x = 1;
-                    int z = 1;
-                    if (arr[i] == 2 || arr[i] == 3) {
-                        x = -1;
-                    }
-                    if (arr[i] == 1 || arr[i] == 3) {
-                        z = -1;
-                    }
-                    transforms[i].position = new Vector3(Random.value * x * 4, 0.5f, Random.value * z * 4);
-                }
+            previousDistanceToTarget = float.PositiveInfinity;
+            if (IsOutOfRegion() || IsHitObstacle()) {
+                float angle = Random.value * Mathf.PI * 2;
+
+                float randomRadius = Random.value * 2 + 2;
+                float x = Mathf.Cos(angle) * randomRadius;
+                float z = Mathf.Sin(angle) * randomRadius;
+                transform.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
+
+                randomRadius = Random.value * 2 + 2;
+                x = Mathf.Cos(angle) * randomRadius;
+                z = Mathf.Sin(angle) * randomRadius;
+                Target.position = convertToFloorRelativePos(new Vector3(-x, 0.5f, -z));
+
+                angle = angle + Mathf.PI / 2;
+                x = Mathf.Cos(angle) * (Random.value * 4 - 2);
+                z = Mathf.Sin(angle) * (Random.value * 4 - 2);
+                Obstacle.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
+
                 rBody.angularVelocity = Vector3.zero;
                 rBody.velocity = Vector3.zero;
             }
             else {
-                while (true) {
-                    var newPosition = new Vector3(Random.value * 8 - 4,
-                                                      0.5f,
-                                                      Random.value * 8 - 4);
-                    if (Vector3.Distance(transform.position, newPosition) > 2f) {
-                        Target.position = newPosition;
-                        break;
-                    }
-                }
-                while (true) {
-                    var newPosition = new Vector3(Random.value * 8 - 4,
-                                                      0.5f,
-                                                      Random.value * 8 - 4);
-                    if (Vector3.Distance(transform.position, newPosition) > 2f && Vector3.Distance(Target.position, newPosition) > 2f) {
-                        Obstacle.position = newPosition;
-                        break;
-                    }
-                }
+                var angle = Mathf.Atan2(Vector3.Dot(Vector3.up, Vector3.Cross(converToWorldRelativePos(transform.position), Vector3.right)),
+                    Vector3.Dot(converToWorldRelativePos(transform.position), Vector3.right));
+                float randomRadius = Random.value * 2 + 2;
+                float x = Mathf.Cos(angle) * randomRadius;
+                float z = Mathf.Sin(angle) * randomRadius;
+                Target.position = convertToFloorRelativePos(new Vector3(-x, 0.5f, -z));
+
+                angle = angle + Mathf.PI / 2;
+                x = Mathf.Cos(angle) * (Random.value * 4 - 2);
+                z = Mathf.Sin(angle) * (Random.value * 4 - 2);
+                Obstacle.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
             }
         }
 
@@ -96,13 +82,15 @@ namespace ObstacleRoller {
             //AddVectorObs((transform.position.x - 5) / 5);
             //AddVectorObs((transform.position.z + 5) / 5);
             //AddVectorObs((transform.position.z - 5) / 5);
-
-            AddVectorObs(transform.position.x / 5);
-            AddVectorObs(transform.position.z / 5);
-            AddVectorObs(Target.position.x / 5);
-            AddVectorObs(Target.position.z / 5);
-            AddVectorObs(Obstacle.position.x / 5);
-            AddVectorObs(Obstacle.position.z / 5);
+            var agentPos = converToWorldRelativePos(transform.position);
+            var targetPos = converToWorldRelativePos(Target.position);
+            var obstaclePos = converToWorldRelativePos(Obstacle.position);
+            AddVectorObs(agentPos.x / 5);
+            AddVectorObs(agentPos.z / 5);
+            AddVectorObs(targetPos.x / 5);
+            AddVectorObs(targetPos.z / 5);
+            AddVectorObs(obstaclePos.x / 5);
+            AddVectorObs(obstaclePos.z / 5);
 
             // Agent velocity
             AddVectorObs(rBody.velocity.x / 5);
@@ -111,22 +99,28 @@ namespace ObstacleRoller {
 
         public float speed = 10;
 
+        private float previousDistanceToTarget = float.PositiveInfinity;
         public override void AgentAction(float[] vectorAction, string textAction) {
             // Rewards
-            float distanceToTarget = Vector3.Distance(this.transform.position, Target.position);
-            float distanceToObstacle = Vector3.Distance(this.transform.position, Obstacle.position);
+            float distanceToTarget = Vector3.Distance(transform.position, Target.position);
 
 
             if (distanceToTarget < 1.42f) { // Reached target
                 AddReward(1.0f);
                 Done();
             }
-            else if (distanceToObstacle < 1.42f || IsOutOfRegion()) {
+            else if (IsHitObstacle() || IsOutOfRegion()) {
                 AddReward(-1.0f);
                 Done();
             }
-            else { // Time penalty
-                AddReward(-0.01f);
+            else {
+                if (distanceToTarget < previousDistanceToTarget) {
+                    AddReward(0.01f);
+                }
+                else {
+                    AddReward(-0.01f);
+                }
+                previousDistanceToTarget = distanceToTarget;
             }
 
             // Actions, size = 2
