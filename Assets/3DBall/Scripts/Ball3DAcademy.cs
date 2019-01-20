@@ -1,10 +1,9 @@
-﻿using MLAgents;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-namespace ObstacleRoller {
-    public class RollerAcademy : Academy {
+using MLAgents;
+namespace Ball3D {
+    public class Ball3DAcademy : Academy {
         public GameObject AreaPrefab;
         private List<GameObject> Areas;
         private int LastCopy = 1;

@@ -6,91 +6,61 @@ using System.Linq;
 namespace ObstacleRoller {
     public class RollerAgent : Agent {
         private Rigidbody rBody;
-        void Start() {
-            rBody = GetComponent<Rigidbody>();
-        }
-
+        private Rigidbody obstacleRBody;
         public Transform Target;
-        public Transform Obstacle;
-        public Transform Floor;
+        public GameObject Obstacle;
+        public override void InitializeAgent() {
+            rBody = GetComponent<Rigidbody>();
+            obstacleRBody = Obstacle.GetComponent<Rigidbody>();
+        }
 
-        private Vector3 convertToFloorRelativePos(Vector3 v) {
-            return new Vector3(Floor.position.x + v.x, Floor.position.y + v.y, Floor.position.z + v.z);
-        }
-        private Vector3 converToWorldRelativePos(Vector3 v) {
-            return new Vector3(v.x - Floor.position.x, v.y - Floor.position.y, v.z - Floor.position.z);
-        }
         private bool IsOutOfRegion() {
-            return transform.position.x > Floor.position.x + 5 || transform.position.x < Floor.position.x - 5
-                || transform.position.z > Floor.position.z + 5 || transform.position.z < Floor.position.z - 5;
+            return transform.localPosition.x > 5 || transform.localPosition.x < -5
+                || transform.localPosition.z > 5 || transform.localPosition.z < -5;
         }
         private bool IsHitObstacle() {
-            float distanceToObstacle = Vector3.Distance(transform.position, Obstacle.position);
+            float distanceToObstacle = Vector3.Distance(transform.localPosition, Obstacle.transform.localPosition);
             return distanceToObstacle < 1.1f;
         }
 
-
         public override void AgentReset() {
-            previousDistanceToTarget = float.PositiveInfinity;
+            float angle = 0;
             if (IsOutOfRegion() || IsHitObstacle()) {
-                float angle = Random.value * Mathf.PI * 2;
+                angle = Random.value * Mathf.PI * 2;
 
-                float randomRadius = Random.value * 2 + 2;
-                float x = Mathf.Cos(angle) * randomRadius;
-                float z = Mathf.Sin(angle) * randomRadius;
-                transform.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
-
-                randomRadius = Random.value * 2 + 2;
-                x = Mathf.Cos(angle) * randomRadius;
-                z = Mathf.Sin(angle) * randomRadius;
-                Target.position = convertToFloorRelativePos(new Vector3(-x, 0.5f, -z));
-
-                angle = angle + Mathf.PI / 2;
-                x = Mathf.Cos(angle) * (Random.value * 4 - 2);
-                z = Mathf.Sin(angle) * (Random.value * 4 - 2);
-                Obstacle.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
-
+                float _randomRadius = Random.value * 2 + 2;
+                float _x = Mathf.Cos(angle) * _randomRadius;
+                float _z = Mathf.Sin(angle) * _randomRadius;
+                transform.localPosition = new Vector3(_x, 0.5f, _z);
                 rBody.angularVelocity = Vector3.zero;
                 rBody.velocity = Vector3.zero;
             }
             else {
-                var angle = Mathf.Atan2(Vector3.Dot(Vector3.up, Vector3.Cross(converToWorldRelativePos(transform.position), Vector3.right)),
-                    Vector3.Dot(converToWorldRelativePos(transform.position), Vector3.right));
-                float randomRadius = Random.value * 2 + 2;
-                float x = Mathf.Cos(angle) * randomRadius;
-                float z = Mathf.Sin(angle) * randomRadius;
-                Target.position = convertToFloorRelativePos(new Vector3(-x, 0.5f, -z));
-
-                angle = angle + Mathf.PI / 2;
-                x = Mathf.Cos(angle) * (Random.value * 4 - 2);
-                z = Mathf.Sin(angle) * (Random.value * 4 - 2);
-                Obstacle.position = convertToFloorRelativePos(new Vector3(x, 0.5f, z));
+                angle = Mathf.Atan2(Vector3.Dot(Vector3.up, Vector3.Cross(transform.localPosition, Vector3.right)),
+                    Vector3.Dot(transform.localPosition, Vector3.right));
             }
+            float randomRadius = Random.value * 2 + 2;
+            float x = Mathf.Cos(angle) * randomRadius;
+            float z = Mathf.Sin(angle) * randomRadius;
+            Target.localPosition = new Vector3(-x, 0.5f, -z);
+
+            Obstacle.transform.localPosition = new Vector3(0, 0.5f, 0);
+            obstacleRBody.angularVelocity = Vector3.zero;
+            obstacleRBody.velocity = Vector3.zero;
         }
 
         public override void CollectObservations() {
-            //Vector3 relativePositionToTarget = Target.position - transform.position;
-            //AddVectorObs(relativePositionToTarget.x / 5);
-            //AddVectorObs(relativePositionToTarget.z / 5);
-
-            //Vector3 relativePositionToObstacle = Obstacle.position - transform.position;
-            //AddVectorObs(relativePositionToObstacle.x / 5);
-            //AddVectorObs(relativePositionToObstacle.z / 5);
-
-            //// Distance to edges of platform
-            //AddVectorObs((transform.position.x + 5) / 5);
-            //AddVectorObs((transform.position.x - 5) / 5);
-            //AddVectorObs((transform.position.z + 5) / 5);
-            //AddVectorObs((transform.position.z - 5) / 5);
-            var agentPos = converToWorldRelativePos(transform.position);
-            var targetPos = converToWorldRelativePos(Target.position);
-            var obstaclePos = converToWorldRelativePos(Obstacle.position);
+            var agentPos = transform.localPosition;
+            var targetPos = Target.localPosition;
+            var obstaclePos = Obstacle.transform.localPosition;
             AddVectorObs(agentPos.x / 5);
             AddVectorObs(agentPos.z / 5);
             AddVectorObs(targetPos.x / 5);
             AddVectorObs(targetPos.z / 5);
             AddVectorObs(obstaclePos.x / 5);
             AddVectorObs(obstaclePos.z / 5);
+            AddVectorObs(obstacleRBody.velocity.x / 5);
+            AddVectorObs(obstacleRBody.velocity.z / 5);
 
             // Agent velocity
             AddVectorObs(rBody.velocity.x / 5);
@@ -99,10 +69,9 @@ namespace ObstacleRoller {
 
         public float speed = 10;
 
-        private float previousDistanceToTarget = float.PositiveInfinity;
         public override void AgentAction(float[] vectorAction, string textAction) {
             // Rewards
-            float distanceToTarget = Vector3.Distance(transform.position, Target.position);
+            float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 
 
             if (distanceToTarget < 1.42f) { // Reached target
@@ -114,13 +83,7 @@ namespace ObstacleRoller {
                 Done();
             }
             else {
-                if (distanceToTarget < previousDistanceToTarget) {
-                    AddReward(0.01f);
-                }
-                else {
-                    AddReward(-0.01f);
-                }
-                previousDistanceToTarget = distanceToTarget;
+                AddReward(-0.01f);
             }
 
             // Actions, size = 2
@@ -128,6 +91,20 @@ namespace ObstacleRoller {
             controlSignal.x = vectorAction[0];
             controlSignal.z = vectorAction[1];
             rBody.AddForce(controlSignal * speed);
+
+
+            float x_delta = transform.position.x + rBody.velocity.x - Obstacle.transform.position.x;
+            float z_delta = transform.position.z + rBody.velocity.z - Obstacle.transform.position.z;
+            float t = Mathf.Max(Mathf.Abs(x_delta), Mathf.Abs(z_delta));
+
+            if (obstacleRBody.velocity.x >= 1) {
+                x_delta = 0;
+            }
+            if (obstacleRBody.velocity.z >= 1) {
+                z_delta = 0;
+            }
+
+            obstacleRBody.AddForce(new Vector3(x_delta, 0, z_delta));
         }
     }
 }

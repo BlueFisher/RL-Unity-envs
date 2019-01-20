@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ObstacleRoller {
+namespace SimpleRoller {
     public class RollerAcademy : Academy {
         public GameObject AreaPrefab;
         private List<GameObject> Areas;
