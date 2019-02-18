@@ -72,7 +72,7 @@ namespace ObstacleRoller {
         public override void AgentAction(float[] vectorAction, string textAction) {
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
-
+            Vector3 toTarget = Target.localPosition - transform.localPosition;
 
             if (distanceToTarget < 1.42f) { // Reached target
                 AddReward(1.0f);
@@ -83,7 +83,7 @@ namespace ObstacleRoller {
                 Done();
             }
             else {
-                AddReward(-0.01f);
+                AddReward(-0.01f + 0.1f * Vector3.Dot(toTarget.normalized, rBody.velocity));
             }
 
             // Actions, size = 2
