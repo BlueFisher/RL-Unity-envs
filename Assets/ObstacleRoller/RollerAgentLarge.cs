@@ -83,7 +83,7 @@ namespace ObstacleRoller {
                 Done();
             }
             else {
-                AddReward(-0.01f + 0.1f * Vector3.Dot(toTarget.normalized, rBody.velocity));
+                AddReward(-0.01f + 0.01f * Vector3.Dot(toTarget.normalized, rBody.velocity.normalized));
             }
 
             // Actions, size = 2
