@@ -28,8 +28,7 @@ public class BouncerAgent : Agent {
     }
 
     public override void AgentAction(float[] vectorAction, string textAction)
-	{	
-		print(vectorAction);
+	{
 	    for (int i = 0; i < vectorAction.Length; i++)
 	    {
 	        vectorAction[i] = Mathf.Clamp(vectorAction[i], -1f, 1f);

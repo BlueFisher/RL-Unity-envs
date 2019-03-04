@@ -75,7 +75,7 @@ namespace ObstacleRoller {
             Vector3 toTarget = Target.localPosition - transform.localPosition;
 
             if (distanceToTarget < 1.42f) { // Reached target
-                AddReward(1.0f);
+                AddReward(5.0f);
                 Done();
             }
             else if (IsHitObstacle() || IsOutOfRegion()) {
