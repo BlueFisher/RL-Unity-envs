@@ -260,7 +260,8 @@ MonoBehaviour:
   broadcastHub:
     broadcastingBrains:
     - {fileID: 11400000, guid: fa62303c1faab2f4084772f7ced863a8, type: 2}
-    _brainsToControl: []
+    _brainsToControl:
+    - {fileID: 11400000, guid: fa62303c1faab2f4084772f7ced863a8, type: 2}
   maxSteps: 0
   trainingConfiguration:
     width: 80
@@ -418,7 +419,7 @@ MonoBehaviour:
   brain: {fileID: 11400000, guid: fa62303c1faab2f4084772f7ced863a8, type: 2}
   agentParameters:
     agentCameras: []
-    maxStep: 1000
+    maxStep: 500
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 1

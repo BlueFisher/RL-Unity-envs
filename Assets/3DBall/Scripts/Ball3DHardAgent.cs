@@ -16,7 +16,7 @@ namespace Ball3D {
         public override void CollectObservations() {
             AddVectorObs(gameObject.transform.rotation.z);
             AddVectorObs(gameObject.transform.rotation.x);
-            AddVectorObs((ball.transform.position - gameObject.transform.position));
+            AddVectorObs(ball.transform.position - gameObject.transform.position);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
