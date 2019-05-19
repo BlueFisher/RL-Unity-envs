@@ -3,14 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - wall
-  - redGoal
-  - ground
-  - orangeGoal
-  - agent
-  - redBlock
-  - orangeBlock
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -20,8 +13,8 @@ TagManager:
   - UI
   - 
   - 
-  - PostProcessing
-  - Area
+  - 
+  - 
   - 
   - 
   - 
