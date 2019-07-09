@@ -15,8 +15,8 @@ namespace ObstacleRoller {
         }
 
         private bool IsOutOfRegion() {
-            return transform.localPosition.x > 5 || transform.localPosition.x < -5
-                || transform.localPosition.z > 5 || transform.localPosition.z < -5;
+            return transform.localPosition.x > 10 || transform.localPosition.x < -10
+                || transform.localPosition.z > 10 || transform.localPosition.z < -10;
         }
         private bool IsHitObstacle() {
             float distanceToObstacle = Vector3.Distance(transform.localPosition, Obstacle.transform.localPosition);
@@ -53,12 +53,12 @@ namespace ObstacleRoller {
             var agentPos = transform.localPosition;
             var targetPos = Target.localPosition;
             var obstaclePos = Obstacle.transform.localPosition;
-            AddVectorObs(agentPos.x / 5);
-            AddVectorObs(agentPos.z / 5);
-            AddVectorObs(targetPos.x / 5);
-            AddVectorObs(targetPos.z / 5);
-            AddVectorObs(obstaclePos.x / 5);
-            AddVectorObs(obstaclePos.z / 5);
+            AddVectorObs(agentPos.x / 10);
+            AddVectorObs(agentPos.z / 10);
+            AddVectorObs(targetPos.x / 10);
+            AddVectorObs(targetPos.z / 10);
+            AddVectorObs(obstaclePos.x / 10);
+            AddVectorObs(obstaclePos.z / 10);
             AddVectorObs(obstacleRBody.velocity.x / 5);
             AddVectorObs(obstacleRBody.velocity.z / 5);
 
@@ -72,7 +72,7 @@ namespace ObstacleRoller {
         public override void AgentAction(float[] vectorAction, string textAction) {
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
-
+            Vector3 toTarget = Target.localPosition - transform.localPosition;
 
             if (distanceToTarget < 1.42f) { // Reached target
                 AddReward(1.0f);
@@ -83,7 +83,7 @@ namespace ObstacleRoller {
                 Done();
             }
             else {
-                AddReward(-0.01f);
+                AddReward(-0.01f + 0.01f * Vector3.Dot(toTarget.normalized, rBody.velocity.normalized));
             }
 
             // Actions, size = 2

@@ -9,11 +9,11 @@ namespace MLBoat {
         private AdvancedShipController controller;
         private SimpleBoatAcadamy acadamy;
 
-        private int action_idx = 0;
-        private int reward_idx = 0;
+        private int actionIdx = 0;
+        private int rewardIdx = 0;
 
         public override void InitializeAgent() {
-            acadamy = GameObject.Find("Acadamy").GetComponent<SimpleBoatAcadamy>();
+            acadamy = GameObject.Find("Academy").GetComponent<SimpleBoatAcadamy>();
             controller = GetComponent<AdvancedShipController>();
             controller.Initialize();
         }
@@ -48,8 +48,8 @@ namespace MLBoat {
 
             GenerateTarget();
 
-            action_idx = (int)acadamy.resetParameters["action"];
-            reward_idx = (int)acadamy.resetParameters["reward"];
+            actionIdx = (int)acadamy.resetParameters["action"];
+            rewardIdx = (int)acadamy.resetParameters["reward"];
         }
 
         public override void CollectObservations() {
@@ -60,10 +60,10 @@ namespace MLBoat {
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
-            if (action_idx == 0) {
+            if (actionIdx == 0) {
                 controller.Act(Mathf.Clamp(vectorAction[0], -1, 1), Mathf.Clamp(vectorAction[1], -1, 1));
             }
-            else if (action_idx == 1) {
+            else if (actionIdx == 1) {
                 vectorAction[0] = vectorAction[0] * 0.5f + 0.5f;
                 controller.Act(Mathf.Clamp(vectorAction[0], 0, 1), Mathf.Clamp(vectorAction[1], -1, 1));
             }
@@ -85,10 +85,10 @@ namespace MLBoat {
             }
             else {
                 if (!IsDone()) {
-                    if (reward_idx == 0) {
+                    if (rewardIdx == 0) {
                         SetReward(-0.01f + 0.005f * velocityReward + 0.005f * directionReward);
                     }
-                    else if (reward_idx == 1) {
+                    else if (rewardIdx == 1) {
                         SetReward(-0.01f);
                     }
                 }

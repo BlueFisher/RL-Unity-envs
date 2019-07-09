@@ -5,8 +5,10 @@ using MLAgents;
 namespace Ball3D {
     public class Ball3DAcademy : Academy {
         public GameObject AreaPrefab;
+        public float CopyGap = 10;
         private List<GameObject> Areas;
         private int LastCopy = 1;
+
         public override void InitializeAcademy() {
             Areas = new List<GameObject>();
         }
@@ -19,7 +21,7 @@ namespace Ball3D {
                 }
                 Areas.Clear();
                 for (int i = 0; i < copy - 1; i++) {
-                    GameObject area = Instantiate(AreaPrefab, new Vector3((i + 1) * 11, 0, 0), Quaternion.identity) as GameObject;
+                    GameObject area = Instantiate(AreaPrefab, new Vector3((i + 1) * CopyGap, 0, 0), Quaternion.identity) as GameObject;
                     Areas.Add(area);
                 }
             }

@@ -1,0 +1,20 @@
+2019/6/20 12:09:56
+ 
+2019/6/22 18:45:25
+ 
+2019/6/26 8:51:33
+ 
+2019/6/26 8:53:30
+ 
+2019/7/5 11:25:07
+ 
+2019/7/5 11:26:03
+ 
+2019/7/5 15:02:07
+ 
+2019/7/5 15:04:27
+ 
+Error
+Recorder MovieRecorder is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : 30!
+UnityEditor.EditorApplication:Internal_CallUpdateFunctions()
+

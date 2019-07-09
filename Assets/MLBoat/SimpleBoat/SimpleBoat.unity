@@ -557,7 +557,7 @@ GameObject:
   - component: {fileID: 1343927261}
   - component: {fileID: 1343927260}
   m_Layer: 0
-  m_Name: Acadamy
+  m_Name: Academy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
