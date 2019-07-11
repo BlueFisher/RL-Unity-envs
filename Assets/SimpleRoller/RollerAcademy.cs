@@ -1,4 +1,5 @@
 ﻿using MLAgents;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ namespace SimpleRoller {
         public float CopyGap = 10;
         private List<GameObject> Areas;
         private int LastCopy = 1;
-        
+
         public override void InitializeAcademy() {
             Areas = new List<GameObject>();
         }

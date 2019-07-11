@@ -18,3 +18,163 @@ Error
 Recorder MovieRecorder is set to record at a fixed rate and another component has already set a conflicting value for [Time.captureFramerate], new value being applied : 30!
 UnityEditor.EditorApplication:Internal_CallUpdateFunctions()
 
+2019/7/10 16:08:19
+ 
+2019/7/10 19:07:48
+ 
+Log
+CommandLine : "C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe" -projectpath C:/Users/Fisher/Documents/Unity/RL-Envs -useHub -hubIPC -cloudEnvironment production -hubSessionId 2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:17)
+
+Log
+C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-projectpath
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+C:/Users/Fisher/Documents/Unity/RL-Envs
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-useHub
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubIPC
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-cloudEnvironment
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+production
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubSessionId
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+2019/7/10 19:08:33
+ 
+Log
+CommandLine : "C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe" -projectpath C:/Users/Fisher/Documents/Unity/RL-Envs -useHub -hubIPC -cloudEnvironment production -hubSessionId 2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:17)
+
+Log
+C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-projectpath
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+C:/Users/Fisher/Documents/Unity/RL-Envs
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-useHub
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubIPC
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-cloudEnvironment
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+production
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubSessionId
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+2019/7/10 20:44:31
+ 
+Log
+CommandLine : "C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe" -projectpath C:/Users/Fisher/Documents/Unity/RL-Envs -useHub -hubIPC -cloudEnvironment production -hubSessionId 2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:17)
+
+Log
+C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-projectpath
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+C:/Users/Fisher/Documents/Unity/RL-Envs
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-useHub
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubIPC
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-cloudEnvironment
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+production
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+-hubSessionId
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+Log
+2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c
+UnityEngine.MonoBehaviour:print(Object)
+SimpleRoller.RollerAcademy:Start() (at Assets/SimpleRoller/RollerAcademy.cs:19)
+
+2019/7/10 20:57:30
+ 
