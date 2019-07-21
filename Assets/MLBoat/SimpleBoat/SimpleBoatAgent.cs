@@ -18,17 +18,20 @@ namespace MLBoat {
             controller.Initialize();
         }
 
-        private bool IsOutOfRegion() {
-            float dis = (new Vector2(transform.localPosition.x, transform.localPosition.z)).magnitude;
-            return dis > 38;
-        }
+        //private bool IsOutOfRegion() {
+        //    float dis = (new Vector2(transform.localPosition.x, transform.localPosition.z)).magnitude;
+        //    return dis > 38;
+        //}
+
+        public float TargetRadius = 35;
+        private bool hitted = false;
 
         private void GenerateTarget() {
             while (true) {
                 float angle = Random.value * Mathf.PI * 2;
-                float radius = Random.value * 35;
+                float radius = Random.value * TargetRadius;
                 var newPosition = new Vector3(radius * Mathf.Cos(angle),
-                                                  2f,
+                                                  5f,
                                                   radius * Mathf.Sin(angle));
 
                 if (Vector3.Distance(transform.localPosition, newPosition) > 6f) {
@@ -39,7 +42,7 @@ namespace MLBoat {
         }
 
         public override void AgentReset() {
-            if (IsOutOfRegion()) {
+            if (!hitted) {
                 //transform.rotation = new Quaternion(0, 0, 0, 0);
                 transform.localPosition = Vector3.zero;
                 controller.ShipRigidbody.angularVelocity = Vector3.zero;
@@ -47,6 +50,7 @@ namespace MLBoat {
             }
 
             GenerateTarget();
+            hitted = false;
 
             actionIdx = (int)acadamy.resetParameters["action"];
             rewardIdx = (int)acadamy.resetParameters["reward"];
@@ -68,7 +72,6 @@ namespace MLBoat {
                 controller.Act(Mathf.Clamp(vectorAction[0], 0, 1), Mathf.Clamp(vectorAction[1], -1, 1));
             }
 
-
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
             Vector3 toTarget = Target.localPosition - transform.localPosition;
 
@@ -76,13 +79,14 @@ namespace MLBoat {
             float directionReward = Vector3.Dot(toTarget.normalized, transform.forward.normalized);
 
             if (distanceToTarget < 4f) {
+                hitted = true;
                 SetReward(1.0f);
                 Done();
             }
-            else if (IsOutOfRegion()) {
-                SetReward(-1.0f);
-                Done();
-            }
+            //else if (IsOutOfRegion()) {
+            //    SetReward(-1.0f);
+            //    Done();
+            //}
             else {
                 if (!IsDone()) {
                     if (rewardIdx == 0) {

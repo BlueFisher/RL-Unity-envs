@@ -1,1 +1,0 @@
-"C:\Program Files\Unity\Hub\Editor\2018.4.3f1\Editor\Unity.exe" -projectpath C:/Users/Fisher/Documents/Unity/RL-Envs -useHub -hubIPC -cloudEnvironment production -hubSessionId 2b8829b0-9ed4-11e9-9ca2-cf2bfd525b4c

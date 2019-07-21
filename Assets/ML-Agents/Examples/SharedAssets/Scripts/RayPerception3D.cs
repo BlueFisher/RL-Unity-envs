@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace MLAgents
-{
+namespace Pyramid {
 
     /// <summary>
     /// Ray perception component. Attach this to agents to enable "local perception"
     /// via the use of ray casts directed outward from the agent. 
     /// </summary>
-    public class RayPerception3D : RayPerception
-    {
+    public class RayPerception3D : RayPerception {
         Vector3 endPosition;
         RaycastHit hit;
 
@@ -24,18 +22,15 @@ namespace MLAgents
         /// <param name="endOffset">Ending height offset of ray from center of agent.</param>
         public override List<float> Perceive(float rayDistance,
             float[] rayAngles, string[] detectableObjects,
-            float startOffset, float endOffset)
-        {
+            float startOffset, float endOffset) {
             perceptionBuffer.Clear();
             // For each ray sublist stores categorical information on detected object
             // along with object distance.
-            foreach (float angle in rayAngles)
-            {
+            foreach (float angle in rayAngles) {
                 endPosition = transform.TransformDirection(
                     PolarToCartesian(rayDistance, angle));
                 endPosition.y = endOffset;
-                if (Application.isEditor)
-                {
+                if (Application.isEditor) {
                     Debug.DrawRay(transform.position + new Vector3(0f, startOffset, 0f),
                         endPosition, Color.black, 0.01f, true);
                 }
@@ -43,20 +38,16 @@ namespace MLAgents
                 float[] subList = new float[detectableObjects.Length + 2];
                 if (Physics.SphereCast(transform.position +
                                        new Vector3(0f, startOffset, 0f), 0.5f,
-                    endPosition, out hit, rayDistance))
-                {
-                    for (int i = 0; i < detectableObjects.Length; i++)
-                    {
-                        if (hit.collider.gameObject.CompareTag(detectableObjects[i]))
-                        {
+                    endPosition, out hit, rayDistance)) {
+                    for (int i = 0; i < detectableObjects.Length; i++) {
+                        if (hit.collider.gameObject.CompareTag(detectableObjects[i])) {
                             subList[i] = 1;
                             subList[detectableObjects.Length + 1] = hit.distance / rayDistance;
                             break;
                         }
                     }
                 }
-                else
-                {
+                else {
                     subList[detectableObjects.Length] = 1f;
                 }
 
@@ -69,8 +60,7 @@ namespace MLAgents
         /// <summary>
         /// Converts polar coordinate to cartesian coordinate.
         /// </summary>
-        public static Vector3 PolarToCartesian(float radius, float angle)
-        {
+        public static Vector3 PolarToCartesian(float radius, float angle) {
             float x = radius * Mathf.Cos(DegreeToRadian(angle));
             float z = radius * Mathf.Sin(DegreeToRadian(angle));
             return new Vector3(x, 0f, z);

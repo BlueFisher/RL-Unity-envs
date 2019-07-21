@@ -28,7 +28,6 @@ TagManager:
   - switchOff
   - Water
   - pit
-  - test
   layers:
   - Default
   - TransparentFX
