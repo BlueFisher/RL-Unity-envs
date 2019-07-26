@@ -7,13 +7,13 @@ namespace MLBoat {
     public class SimpleBoatAgent : Agent {
         public Transform Target;
         private AdvancedShipController controller;
-        private SimpleBoatAcadamy acadamy;
+        private Academy acadamy;
 
         private int actionIdx = 0;
         private int rewardIdx = 0;
 
         public override void InitializeAgent() {
-            acadamy = GameObject.Find("Academy").GetComponent<SimpleBoatAcadamy>();
+            acadamy = GameObject.Find("Academy").GetComponent<Academy>();
             controller = GetComponent<AdvancedShipController>();
             controller.Initialize();
         }
@@ -72,7 +72,9 @@ namespace MLBoat {
                 controller.Act(Mathf.Clamp(vectorAction[0], 0, 1), Mathf.Clamp(vectorAction[1], -1, 1));
             }
 
-            float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
+
+            float distanceToTarget = Vector2.Distance(new Vector2(transform.localPosition.x, transform.localPosition.z),
+                new Vector2(Target.localPosition.x, Target.localPosition.z));
             Vector3 toTarget = Target.localPosition - transform.localPosition;
 
             float velocityReward = Vector3.Dot(toTarget.normalized, controller.ShipRigidbody.velocity.normalized);

@@ -146,7 +146,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 605943965}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0414d83faf99a164c91bcba343a58216, type: 3}
+  m_Script: {fileID: 11500000, guid: a26b13b96cbc20f46afd34786eced78d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   broadcastHub:
@@ -170,7 +170,7 @@ MonoBehaviour:
   resetParameters:
     resetParameters:
     - key: copy
-      value: 2
+      value: 1
   AreaPrefab: {fileID: 1554408181}
   CopyGap: 25
 --- !u!4 &605943967

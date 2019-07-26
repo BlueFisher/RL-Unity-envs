@@ -30,6 +30,9 @@ EditorBuildSettings:
     path: Assets/Crawler/Scenes/CrawlerDynamicTarget.unity
     guid: 4745bd08875017c4188fa5dc8c971741
   - enabled: 1
-    path: Assets/RayRoller/RayRoller.unity
+    path: Assets/RayAgents/RayRoller/RayRoller.unity
     guid: 2293717045f4a854d96442c25ff2e27a
+  - enabled: 1
+    path: Assets/RayAgents/RaySearcher/RaySearcher.unity
+    guid: 077b67eed71a6d94099df5c7c24c4009
   m_configObjects: {}

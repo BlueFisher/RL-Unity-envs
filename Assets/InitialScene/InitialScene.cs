@@ -9,8 +9,8 @@ public class InitialScene : MonoBehaviour {
     void Start() {
         List<string> commandLineArgs = new List<string>(Environment.GetCommandLineArgs());
         int index = commandLineArgs.IndexOf("--scene");
-        if(index == -1) {
-            File.WriteAllText("error.log", $"No --scene in {Environment.CommandLine}");
+        if (index == -1) {
+            File.AppendAllText("debug.log", $"No --scene in {Environment.CommandLine}\n");
             Application.Quit();
         }
         else {

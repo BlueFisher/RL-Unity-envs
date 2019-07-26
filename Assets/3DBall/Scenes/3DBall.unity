@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: 1583402088}
   - component: {fileID: 1583402089}
   m_Layer: 0
-  m_Name: Ball3DAcademy
+  m_Name: Academy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -236,21 +236,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1583402087}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e24e321746d203488e263b83fee7b76, type: 3}
+  m_Script: {fileID: 11500000, guid: a26b13b96cbc20f46afd34786eced78d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   broadcastHub:
     broadcastingBrains:
     - {fileID: 11400000, guid: a1a414ccb9cd1334c93b00a59bb6d8ba, type: 2}
     _brainsToControl:
-    - {fileID: 11400000, guid: 383c589e8bb76464eadc2525b5b0f2c1, type: 2}
     - {fileID: 11400000, guid: a1a414ccb9cd1334c93b00a59bb6d8ba, type: 2}
   maxSteps: 0
   trainingConfiguration:
     width: 80
     height: 80
     qualityLevel: 1
-    timeScale: 6.4
+    timeScale: 100
     targetFrameRate: -1
   inferenceConfiguration:
     width: 1280
