@@ -10,7 +10,6 @@ namespace Crawler {
         [Space(10)]
         public Transform target;
         public Transform ground;
-
         public float targetSpawnRadius;
 
         [Header("Body Parts")] [Space(10)] public Transform body;
@@ -48,11 +47,12 @@ namespace Crawler {
         bool isNewDecisionStep;
         int currentDecisionStep;
 
-        private CrawlerAcademy acadamy;
+        private CrawlerAcademy academy;
         private int rewardIdx = 0;
+        private bool isStatic = true;
 
         public override void InitializeAgent() {
-            acadamy = GameObject.Find("Academy").GetComponent<CrawlerAcademy>();
+            academy = GameObject.Find("Academy").GetComponent<CrawlerAcademy>();
 
             jdController = GetComponent<JointDriveController>();
             currentDecisionStep = 1;
@@ -228,7 +228,7 @@ namespace Crawler {
         /// <summary>
         /// Moves target to a random position within specified radius.
         /// </summary>
-        public void GetRandomTargetPos() {
+        public void GenerateTarget() {
             while (true) {
                 float angle = Random.value * Mathf.PI * 2;
                 float radius = Random.value * targetSpawnRadius;
@@ -236,7 +236,7 @@ namespace Crawler {
                                                   1f,
                                                   radius * Mathf.Sin(angle));
 
-                newPosition = newPosition + ground.position;
+                newPosition += ground.position;
 
                 if (Vector3.Distance(body.transform.position, newPosition) > 10f) {
                     target.position = newPosition;
@@ -249,7 +249,10 @@ namespace Crawler {
         /// Loop over body parts and reset them to initial conditions.
         /// </summary>
         public override void AgentReset() {
-            if (resetCrawler) {
+            rewardIdx = (int)academy.resetParameters["reward"];
+            isStatic = academy.resetParameters["static"] != 0f;
+
+            if (isStatic || resetCrawler) {
                 if (dirToTarget != Vector3.zero) {
                     transform.rotation = Quaternion.LookRotation(dirToTarget);
                 }
@@ -261,9 +264,8 @@ namespace Crawler {
                 resetCrawler = true;
             }
 
-            GetRandomTargetPos();
-
-            rewardIdx = (int)acadamy.resetParameters["reward"];
+            if (!isStatic)
+                GenerateTarget();
 
             isNewDecisionStep = true;
             currentDecisionStep = 1;

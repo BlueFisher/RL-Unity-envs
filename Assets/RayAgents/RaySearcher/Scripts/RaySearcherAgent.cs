@@ -6,79 +6,85 @@ using System.Linq;
 namespace RaySearcher {
     public class RaySearcherAgent : Agent {
         private Rigidbody rBody;
-        private bool wallCollided = false;
+        //private bool wallCollided = true;
         private RayPerception rayPer;
 
         public Transform Target;
-        public float TargetRadius = 4;
-        public float RayDistance = 5f;
-        public float[] RayAngles = new float[] { -40f, -20f, 0f, 20f, 40f, -140f, 180f, 140f };
+        public float RayDistance = 35f;
+
+        private Transform[] spawnAreas;
+        public Transform SpawnArea;
 
         public override void InitializeAgent() {
             rBody = GetComponent<Rigidbody>();
             rayPer = GetComponent<RayPerception>();
+
+            List<Transform> tmpSpawnAreas = SpawnArea.GetComponentsInChildren<Transform>().ToList();
+            tmpSpawnAreas.RemoveAt(0);
+            spawnAreas = tmpSpawnAreas.ToArray();
         }
 
         private void GenerateTarget() {
+            int index = Random.Range(0, spawnAreas.Length);
+            var spawnTransform = spawnAreas[index].transform;
+            var xRange = spawnTransform.localScale.x / 2.1f;
+            var zRange = spawnTransform.localScale.z / 2.1f;
             while (true) {
-                var newPosition = new Vector3(TargetRadius * (Random.value * 2 - 1),
-                                                  0.5f,
-                                                  TargetRadius * (Random.value * 2 - 1));
-                if (Vector3.Distance(transform.localPosition, newPosition) > 2f) {
+                var newPosition = new Vector3(Random.Range(-xRange, xRange), 2f, Random.Range(-zRange, zRange)) + spawnTransform.localPosition;
+                if (Utility.GetXZDistance(transform.localPosition, newPosition) > 8f) {
                     Target.localPosition = newPosition;
                     break;
                 }
             }
         }
-        public override void AgentReset() {
-            if (wallCollided) {
-                transform.localPosition = new Vector3(0, 0.5f, 0);
-                rBody.angularVelocity = Vector3.zero;
-                rBody.velocity = Vector3.zero;
-            }
+        private void GenerateAgent() {
+            int index = Random.Range(0, spawnAreas.Length);
+            var spawnTransform = spawnAreas[index].transform;
+            var xRange = spawnTransform.localScale.x / 2.1f;
+            var zRange = spawnTransform.localScale.z / 2.1f;
 
-            GenerateTarget();
-
-            wallCollided = false;
+            transform.localPosition = new Vector3(Random.Range(-xRange, xRange), 0.5f, Random.Range(-zRange, zRange)) + spawnTransform.localPosition;
+            rBody.angularVelocity = Vector3.zero;
+            rBody.velocity = Vector3.zero;
         }
 
-        void OnCollisionEnter(Collision collision) {
-            if (collision.gameObject.CompareTag("wall")) {
-                wallCollided = true;
-            }
+
+        public override void AgentReset() {
+            GenerateAgent();
+            GenerateTarget();
         }
 
         public override void CollectObservations() {
             string[] detectableObjects = { "wall", "target" };
 
-            AddVectorObs(rayPer.Perceive(RayDistance, RayAngles, detectableObjects, 0f, 0f));
+            float[] rayAngles = new float[] { -40f, -30f, -20f, -10f, 0f, 10f, 20f, 30f, 40f };
+            AddVectorObs(rayPer.Perceive(RayDistance, rayAngles, detectableObjects, 0f, 0f));
 
-            // Agent velocity
-            AddVectorObs(rBody.velocity.x / 5);
-            AddVectorObs(rBody.velocity.z / 5);
+            AddVectorObs(transform.localPosition.x / 40f);
+            AddVectorObs(transform.localPosition.z / 40f);
+            AddVectorObs(transform.forward.x);
+            AddVectorObs(transform.forward.z);
+            AddVectorObs(transform.InverseTransformDirection(rBody.velocity).x / 5);
+            AddVectorObs(transform.InverseTransformDirection(rBody.velocity).z / 5);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
             // Rewards
-            float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
+            float distanceToTarget = Utility.GetXZDistance(transform.localPosition, Target.localPosition);
 
-            if (distanceToTarget < 1.42f) { // Reached target
-                SetReward(1.0f);
-                Done();
-            }
-            else if (wallCollided) {
-                SetReward(-1.0f);
+            if (distanceToTarget < 5f) { // Reached target
+                SetReward(2f);
                 Done();
             }
             else { // Time penalty
-                SetReward(-0.01f);
+                AddReward(-1f / agentParameters.maxStep);
             }
 
             var rotateDir = transform.up * Mathf.Clamp(vectorAction[0], -1f, 1f);
             var dirToGo = transform.forward * Mathf.Clamp(vectorAction[1], -1f, 1f);
 
             transform.Rotate(rotateDir, Time.deltaTime * 200f);
-            rBody.AddForce(dirToGo, ForceMode.VelocityChange);
+            rBody.AddForce(dirToGo * 2f, ForceMode.VelocityChange);
         }
     }
 }

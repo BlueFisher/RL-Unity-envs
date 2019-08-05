@@ -32,7 +32,7 @@ namespace RaySearcher {
                     g.transform.parent = gameObject.transform;
                     LineRenderer line = g.AddComponent<LineRenderer>();
                     line.material = new Material(Shader.Find("Sprites/Default"));
-                    line.startWidth = 0.02f;
+                    line.startWidth = 0.1f;
                     line.startColor = line.endColor = Color.green;
                     lineGameObjects.Add(g);
                 }

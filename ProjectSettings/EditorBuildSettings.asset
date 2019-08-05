@@ -27,11 +27,11 @@ EditorBuildSettings:
     path: Assets/MLBoat/SimpleBoat/SimpleBoat.unity
     guid: abd83357d5c17564ca63b368a3de876e
   - enabled: 1
-    path: Assets/Crawler/Scenes/CrawlerDynamicTarget.unity
+    path: Assets/Crawler/Scenes/Crawler.unity
     guid: 4745bd08875017c4188fa5dc8c971741
   - enabled: 1
     path: Assets/RayAgents/RayRoller/RayRoller.unity
-    guid: 2293717045f4a854d96442c25ff2e27a
+    guid: b0fdaa67fced32244a989db2da888e6f
   - enabled: 1
     path: Assets/RayAgents/RaySearcher/RaySearcher.unity
     guid: 077b67eed71a6d94099df5c7c24c4009
