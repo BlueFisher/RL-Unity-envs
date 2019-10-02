@@ -9,13 +9,16 @@ EditorBuildSettings:
     path: Assets/InitialScene/InitialScene.unity
     guid: c3f4d99fc7b38c24fb3e690228ac0c4b
   - enabled: 1
-    path: Assets/SimpleRoller/Continous/ContinousSimpleRoller.unity
+    path: Assets/Roller/Continous/ContinousSimpleRoller.unity
     guid: 8bb6592a02e75bc47ad7bf64a0c28d89
   - enabled: 1
-    path: Assets/SimpleRoller/Discrete/DiscreteSimpleRoller.unity
-    guid: 55a530e93a7b3974494a62ae8ab80a47
+    path: Assets/Roller/Continous/ContinousHardRoller.unity
+    guid: b2ef2d0e7aae0e44d9669541e403709a
   - enabled: 1
-    path: Assets/SimpleRoller/VisualSimpleRoller/VisualSimpleRoller.unity
+    path: Assets/Roller/Continous/ContinousHardStackRoller.unity
+    guid: 3714c18803dc49a46b86f06d9351384d
+  - enabled: 1
+    path: Assets/Roller/VisualSimpleRoller/VisualSimpleRoller.unity
     guid: 6b7c8c7c1e91d9d4dad1b659791d423a
   - enabled: 1
     path: Assets/3DBall/Scenes/3DBall.unity
@@ -23,6 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/3DBall/Scenes/3DBallHard.unity
     guid: be14f621d73092b4f8f5a7b009b04639
+  - enabled: 1
+    path: Assets/3DBall/Scenes/3DBallHardStack.unity
+    guid: 122fd481153c45848b56c73b7062bd53
   - enabled: 1
     path: Assets/MLBoat/SimpleBoat/SimpleBoat.unity
     guid: abd83357d5c17564ca63b368a3de876e
@@ -32,7 +38,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/RayAgents/RayRoller/RayRoller.unity
     guid: b0fdaa67fced32244a989db2da888e6f
-  - enabled: 1
-    path: Assets/RayAgents/RaySearcher/RaySearcher.unity
-    guid: 077b67eed71a6d94099df5c7c24c4009
   m_configObjects: {}

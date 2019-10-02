@@ -22,7 +22,7 @@ namespace RayRoller {
         public override List<float> Perceive(float rayDistance,
             float[] rayAngles, string[] detectableObjects,
             float startOffset, float endOffset) {
-            perceptionBuffer.Clear();
+            m_PerceptionBuffer.Clear();
             if (rayAngles.Length != lineGameObjects.Count) {
                 foreach (var g in lineGameObjects) {
                     Destroy(g);
@@ -66,10 +66,10 @@ namespace RayRoller {
                     subList[detectableObjects.Length] = 1f;
                 }
 
-                perceptionBuffer.AddRange(subList);
+                m_PerceptionBuffer.AddRange(subList);
             }
 
-            return perceptionBuffer;
+            return m_PerceptionBuffer;
         }
 
         /// <summary>

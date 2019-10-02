@@ -59,11 +59,11 @@ namespace RayRoller {
 
             AddVectorObs(rayPer.Perceive(RayDistance, rayAngles, detectableObjects, 0f, 0f));
 
-            AddVectorObs(transform.localPosition.x / 6f);
-            AddVectorObs(transform.localPosition.z / 6f);
+            AddVectorObs(transform.localPosition.x / 9f);
+            AddVectorObs(transform.localPosition.z / 9f);
             // Agent velocity
-            AddVectorObs(rBody.velocity.x / 5f);
-            AddVectorObs(rBody.velocity.z / 5f);
+            AddVectorObs(rBody.velocity.x / 6f);
+            AddVectorObs(rBody.velocity.z / 6f);
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
