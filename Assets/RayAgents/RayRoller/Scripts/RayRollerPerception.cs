@@ -2,32 +2,23 @@
 using UnityEngine;
 
 namespace RayRoller {
-    /// <summary>
-    /// Ray perception component. Attach this to agents to enable "local perception"
-    /// via the use of ray casts directed outward from the agent. 
-    /// </summary>
-    public class RayRollerPerception : RayPerception {
-        private RaycastHit hit;
-        private List<GameObject> lineGameObjects = new List<GameObject>();
+    public class RayRollerPerception : MonoBehaviour {
+        public float RayDistance = 3;
 
-        /// <summary>
-        /// Creates perception vector to be used as part of an observation of an agent.
-        /// </summary>
-        /// <returns>The partial vector observation corresponding to the set of rays</returns>
-        /// <param name="rayDistance">Radius of rays</param>
-        /// <param name="rayAngles">Angles of rays (starting from (1,0) on unit circle).</param>
-        /// <param name="detectableObjects">List of tags which correspond to object types agent can see</param>
-        /// <param name="startOffset">Starting height offset of ray from center of agent.</param>
-        /// <param name="endOffset">Ending height offset of ray from center of agent.</param>
-        public override List<float> Perceive(float rayDistance,
-            float[] rayAngles, string[] detectableObjects,
-            float startOffset, float endOffset) {
-            m_PerceptionBuffer.Clear();
-            if (rayAngles.Length != lineGameObjects.Count) {
-                foreach (var g in lineGameObjects) {
-                    Destroy(g);
-                }
-                for (int i = 0; i < rayAngles.Length; i++) {
+        public List<string> DetectableObjects;
+        public float StartOffset = 0f;
+        public float EndOffset = 0f;
+
+        private RaycastHit hit;
+        private List<float> rayAngles;
+        private List<GameObject> lineGameObjects = new List<GameObject>();
+        private List<float> m_PerceptionBuffer = new List<float>();
+
+        public void Initialize(float[] rayAngles) {
+            this.rayAngles = new List<float>(rayAngles);
+
+            if (this.rayAngles.Count != lineGameObjects.Count) {
+                for (int i = 0; i < this.rayAngles.Count; i++) {
                     GameObject g = new GameObject(i.ToString());
                     LineRenderer line = g.AddComponent<LineRenderer>();
                     line.material = new Material(Shader.Find("Sprites/Default"));
@@ -36,14 +27,19 @@ namespace RayRoller {
                     lineGameObjects.Add(g);
                 }
             }
-            // For each ray sublist stores categorical information on detected object
-            // along with object distance.
-            for (int i = 0; i < rayAngles.Length; i++) {
+
+            Act();
+        }
+
+        public void Act() {
+            m_PerceptionBuffer.Clear();
+
+            for (int i = 0; i < rayAngles.Count; i++) {
                 float angle = rayAngles[i];
 
-                Vector3 startPosition = transform.position + new Vector3(0f, startOffset, 0f);
-                Vector3 offsetDirection = PolarToCartesian(rayDistance, angle);
-                offsetDirection.y = endOffset;
+                Vector3 startPosition = transform.position + new Vector3(0f, StartOffset, 0f);
+                Vector3 offsetDirection = PolarToCartesian(RayDistance, angle);
+                offsetDirection.y = EndOffset;
                 Vector3 endPosition = startPosition + offsetDirection;
 
                 LineRenderer lineRenderer = lineGameObjects[i].GetComponent<LineRenderer>();
@@ -51,24 +47,26 @@ namespace RayRoller {
                 lineRenderer.SetPosition(0, startPosition);
                 lineRenderer.SetPosition(1, endPosition);
 
-                float[] subList = new float[detectableObjects.Length + 2];
-                if (Physics.SphereCast(startPosition, 0.02f, offsetDirection, out hit, rayDistance)) {
+                float[] subList = new float[DetectableObjects.Count + 2];
+                if (Physics.SphereCast(startPosition, 0.02f, offsetDirection, out hit, RayDistance)) {
                     lineRenderer.startColor = lineRenderer.endColor = Color.red;
-                    for (int j = 0; j < detectableObjects.Length; j++) {
-                        if (hit.collider.gameObject.CompareTag(detectableObjects[j])) {
+                    for (int j = 0; j < DetectableObjects.Count; j++) {
+                        if (hit.collider.gameObject.CompareTag(DetectableObjects[j])) {
                             subList[j] = 1;
-                            subList[detectableObjects.Length + 1] = hit.distance / rayDistance;
+                            subList[DetectableObjects.Count + 1] = hit.distance / RayDistance;
                             break;
                         }
                     }
                 }
                 else {
-                    subList[detectableObjects.Length] = 1f;
+                    subList[DetectableObjects.Count] = 1f;
                 }
 
                 m_PerceptionBuffer.AddRange(subList);
             }
+        }
 
+        public List<float> Perceive() {
             return m_PerceptionBuffer;
         }
 
@@ -79,6 +77,10 @@ namespace RayRoller {
             float x = radius * Mathf.Cos(DegreeToRadian(angle));
             float z = radius * Mathf.Sin(DegreeToRadian(angle));
             return new Vector3(x, 0f, z);
+        }
+
+        public static float DegreeToRadian(float degree) {
+            return degree * Mathf.PI / 180f;
         }
 
     }

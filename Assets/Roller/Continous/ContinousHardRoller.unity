@@ -149,12 +149,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a26b13b96cbc20f46afd34786eced78d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadcastHub:
-    broadcastingBrains:
-    - {fileID: 11400000, guid: 3f1fb83b646f23048a91e1b5f61b6ad7, type: 2}
-    m_BrainsToControl:
-    - {fileID: 11400000, guid: 21e9bafac79d97e46a7d3e83381c2b08, type: 2}
-    - {fileID: 11400000, guid: 3f1fb83b646f23048a91e1b5f61b6ad7, type: 2}
   m_TrainingConfiguration:
     width: 80
     height: 80
@@ -236,7 +230,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 52eab8ab5010f438fab93da85735ba1d, type: 2}
+  - {fileID: 2100000, guid: 88b9ae7af2c1748a0a1f63407587a601, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -593,8 +587,9 @@ GameObject:
   - component: {fileID: 2092232356}
   - component: {fileID: 2092232355}
   - component: {fileID: 2092232354}
+  - component: {fileID: 2092232360}
   m_Layer: 0
-  m_Name: RollerAgent
+  m_Name: Agent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -612,10 +607,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4959a132f87e3148abcf0f8bbdde6ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: 3f1fb83b646f23048a91e1b5f61b6ad7, type: 2}
   agentParameters:
-    agentCameras: []
-    agentRenderTextures: []
     maxStep: 500
     resetOnDone: 1
     onDemandDecision: 0
@@ -712,3 +704,25 @@ Transform:
   m_Father: {fileID: 1663294059}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2092232360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092232353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    vectorObservationSize: 6
+    numStackedVectorObservations: 1
+    vectorActionSize: 02000000
+    vectorActionDescriptions: []
+    vectorActionSpaceType: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_UseHeuristic: 0
+  m_BehaviorName: HardRoller

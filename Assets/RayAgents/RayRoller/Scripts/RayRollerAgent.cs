@@ -7,17 +7,23 @@ namespace RayRoller {
     public class RayRollerAgent : Agent {
         private Rigidbody rBody;
         private bool wallCollided = false;
-        private RayPerception rayPer;
+        private RayRollerPerception rayPer;
 
         public Transform Target;
         public float TargetRadius = 4;
-        public float RayDistance = 5f;
         public int RayLines = 16;
         public float Speed = 10;
 
         public override void InitializeAgent() {
             rBody = GetComponent<Rigidbody>();
-            rayPer = GetComponent<RayPerception>();
+            rayPer = GetComponent<RayRollerPerception>();
+
+            float[] rayAngles = new float[16];
+            for (int i = 0; i < RayLines; i++) {
+                rayAngles[i] = 360f / RayLines * i;
+            }
+
+            rayPer.Initialize(rayAngles);
         }
 
         private void GenerateTarget() {
@@ -50,14 +56,7 @@ namespace RayRoller {
         }
 
         public override void CollectObservations() {
-            float[] rayAngles = new float[16];
-            for (int i = 0; i < RayLines; i++) {
-                rayAngles[i] = 360f / RayLines * i;
-            }
-
-            string[] detectableObjects = { "wall", "target" };
-
-            AddVectorObs(rayPer.Perceive(RayDistance, rayAngles, detectableObjects, 0f, 0f));
+            AddVectorObs(rayPer.Perceive());
 
             AddVectorObs(transform.localPosition.x / 9f);
             AddVectorObs(transform.localPosition.z / 9f);
@@ -78,15 +77,22 @@ namespace RayRoller {
                 SetReward(-1.0f);
                 Done();
             }
-            else { // Time penalty
-                SetReward(-0.01f);
-            }
 
             // Actions, size = 2
             Vector3 controlSignal = Vector3.zero;
             controlSignal.x = vectorAction[0];
             controlSignal.z = vectorAction[1];
             rBody.AddForce(controlSignal * Speed);
+
+            rayPer.Act();
+        }
+
+        public override float[] Heuristic() {
+            var action = new float[2];
+
+            action[0] = Input.GetAxis("Horizontal");
+            action[1] = Input.GetAxis("Vertical");
+            return action;
         }
     }
 }

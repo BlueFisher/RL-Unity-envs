@@ -333,11 +333,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a26b13b96cbc20f46afd34786eced78d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadcastHub:
-    broadcastingBrains:
-    - {fileID: 11400000, guid: e3bb271c184c1f5448cf815c826f4698, type: 2}
-    m_BrainsToControl:
-    - {fileID: 11400000, guid: e3bb271c184c1f5448cf815c826f4698, type: 2}
   m_TrainingConfiguration:
     width: 80
     height: 80
@@ -996,6 +991,7 @@ GameObject:
   - component: {fileID: 2092232355}
   - component: {fileID: 2092232360}
   - component: {fileID: 2092232354}
+  - component: {fileID: 2092232361}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
@@ -1015,17 +1011,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 789c153060528c642b1ceb441731f3ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: e3bb271c184c1f5448cf815c826f4698, type: 2}
   agentParameters:
-    agentCameras: []
-    agentRenderTextures: []
     maxStep: 1000
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 1
   Target: {fileID: 1335969434}
   TargetRadius: 9
-  RayDistance: 3
   RayLines: 16
   Speed: 10
 --- !u!54 &2092232355
@@ -1129,3 +1121,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 843f6019f1d179849838bec8332194dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  RayDistance: 3
+  DetectableObjects:
+  - wall
+  - target
+  StartOffset: 0
+  EndOffset: 0
+--- !u!114 &2092232361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2092232353}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    vectorObservationSize: 68
+    numStackedVectorObservations: 1
+    vectorActionSize: 01000000
+    vectorActionDescriptions: []
+    vectorActionSpaceType: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_UseHeuristic: 0
+  m_BehaviorName: RayRoller

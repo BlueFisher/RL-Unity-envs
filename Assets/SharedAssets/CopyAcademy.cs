@@ -22,9 +22,19 @@ public class CopyAcademy : Academy {
                 Destroy(area);
             }
             areas.Clear();
-            for (int i = 0; i < copy - 1; i++) {
-                GameObject area = Instantiate(AreaPrefab, new Vector3((i + 1) * CopyGap, 0, 0), Quaternion.identity) as GameObject;
-                areas.Add(area);
+            int rowNum = Mathf.CeilToInt(Mathf.Sqrt(copy));
+            print(rowNum);
+            for (int i = 0; i < rowNum; i++) {
+                for (int j = 0; j < rowNum; j++) {
+                    if (i == 0 && j == 0)
+                        continue;
+                    if (i * rowNum + j + 1 > copy) {
+                        break;
+                    }
+
+                    GameObject area = Instantiate(AreaPrefab, new Vector3(i * CopyGap, 0, j * CopyGap), Quaternion.identity);
+                    areas.Add(area);
+                }
             }
         }
     }

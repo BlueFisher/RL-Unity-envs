@@ -239,11 +239,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b2e6e9e973aced4dbfc11a20d855693, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadcastHub:
-    broadcastingBrains:
-    - {fileID: 11400000, guid: a1a414ccb9cd1334c93b00a59bb6d8ba, type: 2}
-    m_BrainsToControl:
-    - {fileID: 11400000, guid: a1a414ccb9cd1334c93b00a59bb6d8ba, type: 2}
   m_TrainingConfiguration:
     width: 80
     height: 80
@@ -934,6 +929,7 @@ GameObject:
   - component: {fileID: 6303393903224039757}
   - component: {fileID: 6308464021255976623}
   - component: {fileID: 6300487396731477532}
+  - component: {fileID: 6300487396731477533}
   m_Layer: 0
   m_Name: Agent
   m_TagString: Untagged
@@ -953,16 +949,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a789f4f98bb75304791c94db50833792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: a1a414ccb9cd1334c93b00a59bb6d8ba, type: 2}
   agentParameters:
-    agentCameras: []
-    agentRenderTextures: []
     maxStep: 5000
     resetOnDone: 1
     onDemandDecision: 0
     numberOfActionsBetweenDecisions: 5
   Ball: {fileID: 6298691258432418843}
   IsHardMode: 0
+--- !u!114 &6300487396731477533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6300487396731477531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    vectorObservationSize: 8
+    numStackedVectorObservations: 1
+    vectorActionSize: 02000000
+    vectorActionDescriptions: []
+    vectorActionSpaceType: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_UseHeuristic: 0
+  m_BehaviorName: 3DBall
 --- !u!4 &6303393903224039757
 Transform:
   m_ObjectHideFlags: 0

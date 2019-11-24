@@ -1264,6 +1264,7 @@ GameObject:
   - component: {fileID: 1039682682}
   - component: {fileID: 1039682684}
   - component: {fileID: 1039682683}
+  - component: {fileID: 1039682685}
   m_Layer: 0
   m_Name: Crawler
   m_TagString: Untagged
@@ -1322,10 +1323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7bb72c4a6f414a49bb8c02026be6aa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brain: {fileID: 11400000, guid: 5eaafc20a8a555b49bc8413734bda088, type: 2}
   agentParameters:
-    agentCameras: []
-    agentRenderTextures: []
     maxStep: 5000
     resetOnDone: 1
     onDemandDecision: 0
@@ -1352,6 +1350,28 @@ MonoBehaviour:
   foot3: {fileID: 913665088}
   groundedMaterial: {fileID: 0}
   unGroundedMaterial: {fileID: 0}
+--- !u!114 &1039682685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039682681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    vectorObservationSize: 129
+    numStackedVectorObservations: 1
+    vectorActionSize: 14000000
+    vectorActionDescriptions: []
+    vectorActionSpaceType: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_UseHeuristic: 0
+  m_BehaviorName: My Behavior
 --- !u!1 &1160368553
 GameObject:
   m_ObjectHideFlags: 0
@@ -2734,10 +2754,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9f4af43e2e2acd4c9e25ea7e2da0257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  broadcastHub:
-    broadcastingBrains:
-    - {fileID: 11400000, guid: 5eaafc20a8a555b49bc8413734bda088, type: 2}
-    m_BrainsToControl: []
   m_TrainingConfiguration:
     width: 80
     height: 80

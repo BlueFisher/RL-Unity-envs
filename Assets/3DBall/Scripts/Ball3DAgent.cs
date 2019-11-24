@@ -28,20 +28,19 @@ namespace Ball3D {
         }
 
         public override void AgentAction(float[] vectorAction, string textAction) {
-            if (brain.brainParameters.vectorActionSpaceType == SpaceType.Continuous) {
-                var actionZ = 2f * Mathf.Clamp(vectorAction[0], -1f, 1f);
-                var actionX = 2f * Mathf.Clamp(vectorAction[1], -1f, 1f);
+            var actionZ = 2f * Mathf.Clamp(vectorAction[0], -1f, 1f);
+            var actionX = 2f * Mathf.Clamp(vectorAction[1], -1f, 1f);
 
-                if ((gameObject.transform.rotation.z < 0.25f && actionZ > 0f) ||
-                    (gameObject.transform.rotation.z > -0.25f && actionZ < 0f)) {
-                    gameObject.transform.Rotate(new Vector3(0, 0, 1), actionZ);
-                }
-
-                if ((gameObject.transform.rotation.x < 0.25f && actionX > 0f) ||
-                    (gameObject.transform.rotation.x > -0.25f && actionX < 0f)) {
-                    gameObject.transform.Rotate(new Vector3(1, 0, 0), actionX);
-                }
+            if ((gameObject.transform.rotation.z < 0.25f && actionZ > 0f) ||
+                (gameObject.transform.rotation.z > -0.25f && actionZ < 0f)) {
+                gameObject.transform.Rotate(new Vector3(0, 0, 1), actionZ);
             }
+
+            if ((gameObject.transform.rotation.x < 0.25f && actionX > 0f) ||
+                (gameObject.transform.rotation.x > -0.25f && actionX < 0f)) {
+                gameObject.transform.Rotate(new Vector3(1, 0, 0), actionX);
+            }
+
             if ((Ball.transform.position.y - gameObject.transform.position.y) < -2f ||
                 Mathf.Abs(Ball.transform.position.x - gameObject.transform.position.x) > 3f ||
                 Mathf.Abs(Ball.transform.position.z - gameObject.transform.position.z) > 3f) {
@@ -51,6 +50,14 @@ namespace Ball3D {
             else {
                 SetReward(0.1f);
             }
+        }
+
+        public override float[] Heuristic() {
+            var action = new float[2];
+
+            action[0] = -Input.GetAxis("Horizontal");
+            action[1] = Input.GetAxis("Vertical");
+            return action;
         }
 
         public override void AgentReset() {
