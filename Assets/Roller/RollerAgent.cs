@@ -61,7 +61,7 @@ namespace Roller {
 
         public float speed = 10;
 
-        public override void AgentAction(float[] vectorAction, string textAction) {
+        public override void AgentAction(float[] vectorAction) {
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 

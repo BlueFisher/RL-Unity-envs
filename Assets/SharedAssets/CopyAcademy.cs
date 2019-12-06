@@ -23,7 +23,7 @@ public class CopyAcademy : Academy {
             }
             areas.Clear();
             int rowNum = Mathf.CeilToInt(Mathf.Sqrt(copy));
-            print(rowNum);
+
             for (int i = 0; i < rowNum; i++) {
                 for (int j = 0; j < rowNum; j++) {
                     if (i == 0 && j == 0)

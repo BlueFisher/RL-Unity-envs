@@ -65,7 +65,7 @@ namespace RayRoller {
             AddVectorObs(rBody.velocity.z / 6f);
         }
 
-        public override void AgentAction(float[] vectorAction, string textAction) {
+        public override void AgentAction(float[] vectorAction) {
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 

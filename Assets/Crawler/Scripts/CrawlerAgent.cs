@@ -119,7 +119,7 @@ namespace Crawler {
 
         private bool resetCrawler = true;
 
-        public override void AgentAction(float[] vectorAction, string textAction) {
+        public override void AgentAction(float[] vectorAction) {
             // Update pos to target
             dirToTarget = target.position - jdController.bodyPartsDict[body].rb.position;
 

@@ -56,7 +56,7 @@ namespace MultiRollerDemo {
 
         public float speed = 10;
 
-        public override void AgentAction(float[] vectorAction, string textAction) {
+        public override void AgentAction(float[] vectorAction) {
             // Rewards
             float distanceToTarget = Vector3.Distance(this.transform.position, Target.position);
 
