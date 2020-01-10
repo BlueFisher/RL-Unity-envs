@@ -14,8 +14,10 @@ public class CopyAcademy : Academy {
     public override void InitializeAcademy() {
         areas = new List<GameObject>();
     }
+
     public override void AcademyReset() {
-        int copy = (int)resetParameters["copy"];
+        IFloatProperties m_ResetParams = FloatProperties;
+        int copy = (int)m_ResetParams.GetPropertyWithDefault("copy", 1);
         if (copy > 1 && copy != lastCopy) {
             lastCopy = copy;
             foreach (var area in areas) {

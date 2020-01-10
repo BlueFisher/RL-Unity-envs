@@ -47,12 +47,13 @@ namespace Crawler {
         bool isNewDecisionStep;
         int currentDecisionStep;
 
-        private CrawlerAcademy academy;
         private int rewardIdx = 0;
         private bool isStatic = true;
+        IFloatProperties m_ResetParams;
 
         public override void InitializeAgent() {
-            academy = GameObject.Find("Academy").GetComponent<CrawlerAcademy>();
+            var academy = FindObjectOfType<Academy>();
+            m_ResetParams = academy.FloatProperties;
 
             jdController = GetComponent<JointDriveController>();
             currentDecisionStep = 1;
@@ -249,8 +250,8 @@ namespace Crawler {
         /// Loop over body parts and reset them to initial conditions.
         /// </summary>
         public override void AgentReset() {
-            rewardIdx = (int)academy.resetParameters["reward"];
-            isStatic = academy.resetParameters["static"] != 0f;
+            rewardIdx = (int)m_ResetParams.GetPropertyWithDefault("reward", 0);
+            isStatic = m_ResetParams.GetPropertyWithDefault("static", 0) != 0f;
 
             if (isStatic || resetCrawler) {
                 if (dirToTarget != Vector3.zero) {

@@ -9,12 +9,12 @@ namespace Ball3D {
         public GameObject Ball;
         public bool IsHardMode = false;
         private Rigidbody m_BallRb;
-        private ResetParameters m_ResetParams;
+        private IFloatProperties m_ResetParams;
 
         public override void InitializeAgent() {
             m_BallRb = Ball.GetComponent<Rigidbody>();
             var academy = FindObjectOfType<Academy>();
-            m_ResetParams = academy.resetParameters;
+            m_ResetParams = academy.FloatProperties;
             SetResetParameters();
         }
 
@@ -52,6 +52,17 @@ namespace Ball3D {
             }
         }
 
+        public override void AgentReset() {
+            gameObject.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+            gameObject.transform.Rotate(new Vector3(1, 0, 0), Random.Range(-10f, 10f));
+            gameObject.transform.Rotate(new Vector3(0, 0, 1), Random.Range(-10f, 10f));
+            m_BallRb.velocity = new Vector3(0f, 0f, 0f);
+            Ball.transform.position = new Vector3(Random.Range(-1.5f, 1.5f), 4f, Random.Range(-1.5f, 1.5f))
+                + gameObject.transform.position;
+            //Reset the parameters when the Agent is reset.
+            SetResetParameters();
+        }
+
         public override float[] Heuristic() {
             var action = new float[2];
 
@@ -60,21 +71,10 @@ namespace Ball3D {
             return action;
         }
 
-        public override void AgentReset() {
-            gameObject.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
-            gameObject.transform.Rotate(new Vector3(1, 0, 0), Random.Range(-10f, 10f));
-            gameObject.transform.Rotate(new Vector3(0, 0, 1), Random.Range(-10f, 10f));
-            m_BallRb.velocity = new Vector3(0f, 0f, 0f);
-            Ball.transform.position = new Vector3(Random.Range(-1.5f, 1.5f), 4f, Random.Range(-1.5f, 1.5f))
-                                          + gameObject.transform.position;
-            //Reset the parameters when the Agent is reset.
-            SetResetParameters();
-        }
-
         public void SetBall() {
             //Set the attributes of the ball by fetching the information from the academy
-            m_BallRb.mass = m_ResetParams["mass"];
-            var scale = m_ResetParams["scale"];
+            m_BallRb.mass = m_ResetParams.GetPropertyWithDefault("mass", 1.0f);
+            var scale = m_ResetParams.GetPropertyWithDefault("scale", 1.0f);
             Ball.transform.localScale = new Vector3(scale, scale, scale);
         }
 
