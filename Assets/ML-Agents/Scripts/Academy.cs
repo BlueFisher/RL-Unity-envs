@@ -323,8 +323,6 @@ namespace MLAgents
             // training mode. In the absence of a communicator, we assume we are
             // in inference mode.
 
-            SetIsInference(!IsCommunicatorOn);
-
             DecideAction += () => { };
             DestroyAction += () => { };
             AgentSetStatus += i => { };

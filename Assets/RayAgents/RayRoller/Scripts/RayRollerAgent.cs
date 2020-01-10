@@ -13,6 +13,7 @@ namespace RayRoller {
         public float TargetRadius = 4;
         public int RayLines = 16;
         public float Speed = 10;
+        public bool AvoidWall = false;
 
         public override void InitializeAgent() {
             rBody = GetComponent<Rigidbody>();
@@ -38,7 +39,8 @@ namespace RayRoller {
             }
         }
         public override void AgentReset() {
-            if (wallCollided) {
+            //print("reset");
+            if (AvoidWall && wallCollided) {
                 transform.localPosition = new Vector3(0, 0.5f, 0);
                 rBody.angularVelocity = Vector3.zero;
                 rBody.velocity = Vector3.zero;
@@ -51,11 +53,13 @@ namespace RayRoller {
 
         void OnCollisionEnter(Collision collision) {
             if (collision.gameObject.CompareTag("wall")) {
+                //print("collision");
                 wallCollided = true;
             }
         }
 
         public override void CollectObservations() {
+            //print("ob");
             AddVectorObs(rayPer.Perceive());
 
             AddVectorObs(transform.localPosition.x / 9f);
@@ -66,16 +70,22 @@ namespace RayRoller {
         }
 
         public override void AgentAction(float[] vectorAction) {
+            //print("action");
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 
             if (distanceToTarget < 1.42f) { // Reached target
+                //print("done hit");
                 SetReward(1.0f);
                 Done();
             }
-            else if (wallCollided) {
+            else if (AvoidWall && wallCollided) {
+                //print("done wallCollided");
                 SetReward(-1.0f);
                 Done();
+            }
+            else {
+                SetReward(-0.01f);
             }
 
             // Actions, size = 2

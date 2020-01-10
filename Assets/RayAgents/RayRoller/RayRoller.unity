@@ -350,7 +350,7 @@ MonoBehaviour:
     - key: copy
       value: 1
   AreaPrefab: {fileID: 1663294058}
-  CopyGap: 20
+  CopyGap: 21
 --- !u!4 &605943967
 Transform:
   m_ObjectHideFlags: 0
@@ -1015,11 +1015,12 @@ MonoBehaviour:
     maxStep: 1000
     resetOnDone: 1
     onDemandDecision: 0
-    numberOfActionsBetweenDecisions: 1
+    numberOfActionsBetweenDecisions: 10
   Target: {fileID: 1335969434}
   TargetRadius: 9
   RayLines: 16
   Speed: 10
+  AvoidWall: 0
 --- !u!54 &2092232355
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1142,10 +1143,10 @@ MonoBehaviour:
   m_BrainParameters:
     vectorObservationSize: 68
     numStackedVectorObservations: 1
-    vectorActionSize: 01000000
+    vectorActionSize: 02000000
     vectorActionDescriptions: []
     vectorActionSpaceType: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
-  m_UseHeuristic: 0
+  m_BehaviorType: 0
   m_BehaviorName: RayRoller
