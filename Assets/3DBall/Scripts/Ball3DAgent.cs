@@ -9,12 +9,11 @@ namespace Ball3D {
         public GameObject Ball;
         public bool IsHardMode = false;
         private Rigidbody m_BallRb;
-        private IFloatProperties m_ResetParams;
+        IFloatProperties m_ResetParams;
 
         public override void InitializeAgent() {
             m_BallRb = Ball.GetComponent<Rigidbody>();
-            var academy = FindObjectOfType<Academy>();
-            m_ResetParams = academy.FloatProperties;
+            m_ResetParams = Academy.Instance.FloatProperties;
             SetResetParameters();
         }
 
@@ -40,12 +39,11 @@ namespace Ball3D {
                 (gameObject.transform.rotation.x > -0.25f && actionX < 0f)) {
                 gameObject.transform.Rotate(new Vector3(1, 0, 0), actionX);
             }
-
             if ((Ball.transform.position.y - gameObject.transform.position.y) < -2f ||
                 Mathf.Abs(Ball.transform.position.x - gameObject.transform.position.x) > 3f ||
                 Mathf.Abs(Ball.transform.position.z - gameObject.transform.position.z) > 3f) {
-                Done();
                 SetReward(-1f);
+                Done();
             }
             else {
                 SetReward(0.1f);

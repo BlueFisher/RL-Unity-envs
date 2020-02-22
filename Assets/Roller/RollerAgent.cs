@@ -65,18 +65,17 @@ namespace Roller {
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 
-
             if (distanceToTarget < 1.42f) { // Reached target
-                AddReward(1.0f);
+                SetReward(1.0f);
                 Done();
             }
             else { // Time penalty
-                AddReward(-0.01f);
+                SetReward(-0.01f);
             }
 
             // Fell off platform
             if (IsOutOfRegion()) {
-                AddReward(-1.0f);
+                SetReward(-1.0f);
                 Done();
             }
 
