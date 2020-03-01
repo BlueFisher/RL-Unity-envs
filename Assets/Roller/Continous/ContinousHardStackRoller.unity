@@ -152,6 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 1663294058}
   CopyGap: 11
+  DefaultCopy: 1
 --- !u!4 &768147884
 Transform:
   m_ObjectHideFlags: 0
@@ -730,5 +731,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DecisionPeriod: 1
-  RepeatAction: 1
+  RepeatAction: 0
   offsetStep: 0

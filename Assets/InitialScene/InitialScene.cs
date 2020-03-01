@@ -10,7 +10,6 @@ public class InitialScene : MonoBehaviour {
         List<string> commandLineArgs = new List<string>(Environment.GetCommandLineArgs());
         int index = commandLineArgs.IndexOf("--scene");
         if (index == -1) {
-            File.AppendAllText("debug.log", $"No --scene in {Environment.CommandLine}\n");
             Application.Quit();
         }
         else {

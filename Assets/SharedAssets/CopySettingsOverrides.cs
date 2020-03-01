@@ -18,6 +18,7 @@ public class CopySettingsOverrides : MonoBehaviour {
 
     private void Academy_OnEnvironmentReset() {
         int copy = (int)Academy.Instance.FloatProperties.GetPropertyWithDefault("copy", DefaultCopy);
+
         if (copy > 1 && copy != lastCopy) {
             lastCopy = copy;
             foreach (var area in areas) {

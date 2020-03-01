@@ -104,7 +104,7 @@ namespace MLAgents.Sensor
                     m_CastRadius, m_Transform, m_CastType, m_Observations, m_LayerMask,
                     m_DebugDisplayInfo
                 );
-                adapter.AddRange(m_Observations);
+                adapter?.AddRange(m_Observations);
             }
             return m_Observations.Length;
         }

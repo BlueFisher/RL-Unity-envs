@@ -42,7 +42,7 @@ namespace MLAgents.Sensor
 
 
         [NonSerialized]
-        RayPerceptionSensor m_RaySensor;
+        protected RayPerceptionSensor m_RaySensor;
 
         public abstract RayPerceptionSensor.CastType GetCastType();
 

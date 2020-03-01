@@ -685,7 +685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DecisionPeriod: 1
-  RepeatAction: 1
+  RepeatAction: 0
   offsetStep: 0
 --- !u!1 &2110309520
 GameObject:
@@ -718,6 +718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 1663294058}
   CopyGap: 11
+  DefaultCopy: 1
 --- !u!4 &2110309522
 Transform:
   m_ObjectHideFlags: 0

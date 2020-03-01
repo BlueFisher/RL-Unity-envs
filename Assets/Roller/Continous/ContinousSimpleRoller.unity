@@ -731,5 +731,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DecisionPeriod: 1
-  RepeatAction: 1
+  RepeatAction: 0
   offsetStep: 0
