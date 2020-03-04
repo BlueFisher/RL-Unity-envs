@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 1663294058}
   CopyGap: 11
-  DefaultCopy: 1
+  DefaultNAgents: 1
 --- !u!4 &753062770
 Transform:
   m_ObjectHideFlags: 0

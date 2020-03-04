@@ -2,41 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
+using System;
 
 public class CopySettingsOverrides : MonoBehaviour {
     public GameObject AreaPrefab;
     public float CopyGap = 10;
-    public int DefaultCopy = 1;
-    protected List<GameObject> areas;
-    protected int lastCopy = 1;
+    public int DefaultNAgents = 1;
 
     private void Awake() {
-        areas = new List<GameObject>();
+        int nAgents = DefaultNAgents;
 
-        Academy.Instance.OnEnvironmentReset += Academy_OnEnvironmentReset;
-    }
+        List<string> commandLineArgs = new List<string>(Environment.GetCommandLineArgs());
+        int index = commandLineArgs.IndexOf("--n_agents");
+        if (index != -1) {
+            nAgents = Convert.ToInt32(commandLineArgs[index + 1]);
+        }
 
-    private void Academy_OnEnvironmentReset() {
-        int copy = (int)Academy.Instance.FloatProperties.GetPropertyWithDefault("copy", DefaultCopy);
-
-        if (copy > 1 && copy != lastCopy) {
-            lastCopy = copy;
-            foreach (var area in areas) {
-                Destroy(area);
-            }
-            areas.Clear();
-            int rowNum = Mathf.CeilToInt(Mathf.Sqrt(copy));
+        if (nAgents > 1) {
+            int rowNum = Mathf.CeilToInt(Mathf.Sqrt(nAgents));
 
             for (int i = 0; i < rowNum; i++) {
                 for (int j = 0; j < rowNum; j++) {
                     if (i == 0 && j == 0)
                         continue;
-                    if (i * rowNum + j + 1 > copy) {
+                    if (i * rowNum + j + 1 > nAgents) {
                         break;
                     }
 
-                    GameObject area = Instantiate(AreaPrefab, new Vector3(i * CopyGap, 0, j * CopyGap), Quaternion.identity);
-                    areas.Add(area);
+                    Instantiate(AreaPrefab, new Vector3(i * CopyGap, 0, j * CopyGap), Quaternion.identity);
                 }
             }
         }

@@ -5,37 +5,34 @@ using System.Linq;
 
 namespace Roller {
     public class RollerAgent : Agent {
-        private Rigidbody rBody;
+        Rigidbody m_AgentRb;
+        IFloatProperties m_ResetParams;
+
         public Transform Target;
         public bool IsHardMode = false;
 
         public override void InitializeAgent() {
-            rBody = GetComponent<Rigidbody>();
+            m_AgentRb = GetComponent<Rigidbody>();
+            m_ResetParams = Academy.Instance.FloatProperties;
         }
 
         private bool IsOutOfRegion() {
             return transform.localPosition.x > 5 || transform.localPosition.x < -5
                 || transform.localPosition.z > 5 || transform.localPosition.z < -5;
         }
-        private void GenerateTarget() {
-            while (true) {
-                var newPosition = new Vector3(Random.value * 8 - 4,
-                                                  0.5f,
-                                                  Random.value * 8 - 4);
-                if (Vector3.Distance(transform.localPosition, newPosition) > 2f) {
-                    Target.localPosition = newPosition;
-                    break;
-                }
-            }
-        }
+
         public override void AgentReset() {
-            if (IsOutOfRegion()) {
+            bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
+
+            if (forceReset || IsOutOfRegion()) {
                 transform.localPosition = new Vector3(0, 0.5f, 0);
-                rBody.angularVelocity = Vector3.zero;
-                rBody.velocity = Vector3.zero;
+                m_AgentRb.angularVelocity = Vector3.zero;
+                m_AgentRb.velocity = Vector3.zero;
             }
 
-            GenerateTarget();
+            Target.localPosition = new Vector3(Random.value * 8 - 4,
+                                                  0.5f,
+                                                  Random.value * 8 - 4);
         }
 
         public override void CollectObservations() {
@@ -54,14 +51,16 @@ namespace Roller {
 
             if (!IsHardMode) {
                 // Agent velocity
-                AddVectorObs(rBody.velocity.x / 5);
-                AddVectorObs(rBody.velocity.z / 5);
+                AddVectorObs(m_AgentRb.velocity.x / 5);
+                AddVectorObs(m_AgentRb.velocity.z / 5);
             }
         }
 
         public float speed = 10;
 
         public override void AgentAction(float[] vectorAction) {
+            m_ResetParams.SetProperty("force_reset", 0);
+
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
 
@@ -83,7 +82,7 @@ namespace Roller {
             Vector3 controlSignal = Vector3.zero;
             controlSignal.x = vectorAction[0];
             controlSignal.z = vectorAction[1];
-            rBody.AddForce(controlSignal * speed);
+            m_AgentRb.AddForce(controlSignal * speed);
         }
 
         public override float[] Heuristic() {

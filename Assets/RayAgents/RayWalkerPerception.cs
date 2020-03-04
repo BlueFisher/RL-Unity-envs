@@ -10,6 +10,9 @@ namespace RayRoller {
         List<LineRenderer> lines;
 
         private void FixedUpdate() {
+            if (m_RaySensor?.debugDisplayInfo == null)
+                return;
+
             var debugInfo = m_RaySensor.debugDisplayInfo;
             if (debugInfo.rayInfos == null)
                 needWrite = true;
@@ -28,7 +31,6 @@ namespace RayRoller {
                     lines.Add(line);
                 }
             }
-
             for (int i = 0; i < debugInfo.rayInfos.Length; i++) {
                 var rayInfo = debugInfo.rayInfos[i];
                 var line = lines[i];

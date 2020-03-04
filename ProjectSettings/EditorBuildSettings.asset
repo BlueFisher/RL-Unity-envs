@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/RayAgents/RayWalker.unity
     guid: b0fdaa67fced32244a989db2da888e6f
+  - enabled: 1
+    path: Assets/RayAgents/RayObstacleWalker.unity
+    guid: 9d44b685960c21e4883afc6d7f9999a9
   m_configObjects: {}
