@@ -3,25 +3,43 @@ using UnityEngine;
 using MLAgents;
 using System.Linq;
 
-namespace RayRoller {
-    public class RayWalkerAgent : Agent {
-        Rigidbody m_AgentRb;
-        Rigidbody m_TargetRb;
+namespace RayAgents {
+    public class RayAgent : Agent {
+        protected Rigidbody m_AgentRb;
+        protected Rigidbody m_TargetRb;
+        protected DecisionRequester m_DecisionRequester;
+        protected IFloatProperties m_ResetParams;
 
-        bool wallCollided = false;
-        bool targetCollided = false;
-
-        IFloatProperties m_ResetParams;
+        protected bool wallCollided = false;
+        protected bool targetCollided = false;
 
         public Transform Target;
-        public float TargetRadius = 9;
+        public float SpawnRadius = 9;
         public float Speed = 2;
         public bool AvoidWall = false;
 
         public override void InitializeAgent() {
             m_AgentRb = GetComponent<Rigidbody>();
             m_TargetRb = Target.GetComponent<Rigidbody>();
+            m_DecisionRequester = GetComponent<DecisionRequester>();
             m_ResetParams = Academy.Instance.FloatProperties;
+        }
+
+        protected virtual void GenerateAgent() {
+            transform.localPosition = new Vector3(SpawnRadius * (Random.value * 2 - 1),
+                                                        0.5f,
+                                                        SpawnRadius * (Random.value * 2 - 1));
+            transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
+            m_AgentRb.velocity = Vector3.zero;
+        }
+
+        protected virtual void GenerateTarget() {
+            Target.localPosition = new Vector3(SpawnRadius * (Random.value * 2 - 1),
+                                                1f,
+                                                SpawnRadius * (Random.value * 2 - 1));
+            Target.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
+            m_TargetRb.velocity = Vector3.zero;
+            m_TargetRb.angularVelocity = Vector3.zero;
         }
 
         public override void AgentReset() {
@@ -30,20 +48,10 @@ namespace RayRoller {
 
             // Generate agent
             if (forceReset || (AvoidWall && wallCollided)) {
-                transform.localPosition = new Vector3(TargetRadius * (Random.value * 2 - 1),
-                                                        0.5f,
-                                                        TargetRadius * (Random.value * 2 - 1));
-                transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
-                m_AgentRb.velocity = Vector3.zero;
+                GenerateAgent();
             }
 
-            // Generate target
-            Target.localPosition = new Vector3(TargetRadius * (Random.value * 2 - 1),
-                                                1.75f,
-                                                TargetRadius * (Random.value * 2 - 1));
-            Target.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
-            m_TargetRb.velocity = Vector3.zero;
-            m_TargetRb.angularVelocity = Vector3.zero;
+            GenerateTarget();
 
             wallCollided = false;
             targetCollided = false;
@@ -80,7 +88,7 @@ namespace RayRoller {
                 Done();
             }
             else {
-                SetReward(-0.01f);
+                SetReward(-1f / maxStep * m_DecisionRequester.DecisionPeriod);
             }
 
             var dirToGo = transform.forward * vectorAction[0];

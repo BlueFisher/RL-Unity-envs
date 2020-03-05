@@ -27,9 +27,12 @@ EditorBuildSettings:
     path: Assets/3DBall/3DBallHardStack.unity
     guid: 122fd481153c45848b56c73b7062bd53
   - enabled: 1
-    path: Assets/RayAgents/RayWalker.unity
+    path: Assets/RayAgents/Walker/RayWalker.unity
     guid: b0fdaa67fced32244a989db2da888e6f
   - enabled: 1
-    path: Assets/RayAgents/RayObstacleWalker.unity
+    path: Assets/RayAgents/Walker/RayObstacleWalker.unity
     guid: 9d44b685960c21e4883afc6d7f9999a9
+  - enabled: 1
+    path: Assets/RayAgents/Pyramid/RayPyramid.unity
+    guid: 1ac9f158a6aae3e4884c1b535ba26587
   m_configObjects: {}

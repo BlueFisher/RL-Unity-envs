@@ -29,7 +29,11 @@ public class CopySettingsOverrides : MonoBehaviour {
                         break;
                     }
 
-                    Instantiate(AreaPrefab, new Vector3(i * CopyGap, 0, j * CopyGap), Quaternion.identity);
+                    int mid = rowNum / 2;
+                    if (j <= mid)
+                        Instantiate(AreaPrefab, new Vector3(j * CopyGap, 0, i * CopyGap), Quaternion.identity);
+                    else
+                        Instantiate(AreaPrefab, new Vector3((mid - j) * CopyGap, 0, i * CopyGap), Quaternion.identity);
                 }
             }
         }

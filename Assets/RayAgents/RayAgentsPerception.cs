@@ -4,8 +4,8 @@ using UnityEngine;
 using MLAgents;
 using MLAgents.Sensor;
 
-namespace RayRoller {
-    public class RayWalkerPerception : RayPerceptionSensorComponent3D {
+namespace RayAgents {
+    public class RayAgentsPerception : RayPerceptionSensorComponent3D {
         bool needWrite = false;
         List<LineRenderer> lines;
 
