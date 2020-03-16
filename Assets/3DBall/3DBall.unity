@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 6300093860638907599}
   CopyGap: 10
-  DefaultCopy: 1
+  DefaultNAgents: 1
 --- !u!1 &1120584874
 GameObject:
   m_ObjectHideFlags: 0

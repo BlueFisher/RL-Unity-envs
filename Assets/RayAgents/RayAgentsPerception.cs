@@ -27,7 +27,7 @@ namespace RayAgents {
                     GameObject g = new GameObject(i.ToString());
                     LineRenderer line = g.AddComponent<LineRenderer>();
                     line.material = new Material(Shader.Find("Sprites/Default"));
-                    line.startWidth = 0.02f;
+                    line.startWidth = 0.05f;
                     lines.Add(line);
                 }
             }

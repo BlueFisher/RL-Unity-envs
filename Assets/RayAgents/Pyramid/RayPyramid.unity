@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 696379617369714599}
   CopyGap: 110
-  DefaultNAgents: 9
+  DefaultNAgents: 1
 --- !u!4 &917404296
 Transform:
   m_ObjectHideFlags: 0
@@ -1545,7 +1545,7 @@ MonoBehaviour:
   raysPerDirection: 5
   maxRayDegrees: 70
   sphereCastRadius: 0.5
-  rayLength: 20
+  rayLength: 15
   rayLayerMask:
     serializedVersion: 2
     m_Bits: 4294967291

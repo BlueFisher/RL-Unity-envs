@@ -54,10 +54,12 @@ namespace RayAgents {
             AddVectorObs(transform.localPosition.x / 40f);
             AddVectorObs(transform.localPosition.z / 40f);
 
+            //print(transform.rotation.y);
+
             // Agent velocity
             var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
-            AddVectorObs(velocity.x);
-            AddVectorObs(velocity.z);
+            AddVectorObs(velocity.x / 30f);
+            AddVectorObs(velocity.z / 30f);
         }
     }
 }
