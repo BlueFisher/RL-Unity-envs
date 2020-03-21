@@ -2,16 +2,18 @@
 using UnityEngine;
 using MLAgents;
 using System.Linq;
+using MLAgents.SideChannels;
+using MLAgents.Sensors;
 
 namespace Roller {
     public class RollerAgent : Agent {
         Rigidbody m_AgentRb;
-        IFloatProperties m_ResetParams;
+        FloatPropertiesChannel m_ResetParams;
 
         public Transform Target;
         public bool IsHardMode = false;
 
-        public override void InitializeAgent() {
+        public override void Initialize() {
             m_AgentRb = GetComponent<Rigidbody>();
             m_ResetParams = Academy.Instance.FloatProperties;
         }
@@ -21,7 +23,7 @@ namespace Roller {
                 || transform.localPosition.z > 5 || transform.localPosition.z < -5;
         }
 
-        public override void AgentReset() {
+        public override void OnEpisodeBegin() {
             bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
 
             if (forceReset || IsOutOfRegion()) {
@@ -35,30 +37,30 @@ namespace Roller {
                                                   Random.value * 8 - 4);
         }
 
-        public override void CollectObservations() {
+        public override void CollectObservations(VectorSensor sensor) {
             // Calculate relative localPosition
             Vector3 relativePosition = Target.localPosition - transform.localPosition;
 
             // Relative localPosition
-            AddVectorObs(relativePosition.x / 5);
-            AddVectorObs(relativePosition.z / 5);
+            sensor.AddObservation(relativePosition.x / 5);
+            sensor.AddObservation(relativePosition.z / 5);
 
             // Distance to edges of platform
-            AddVectorObs((transform.localPosition.x + 5) / 5);
-            AddVectorObs((transform.localPosition.x - 5) / 5);
-            AddVectorObs((transform.localPosition.z + 5) / 5);
-            AddVectorObs((transform.localPosition.z - 5) / 5);
+            sensor.AddObservation((transform.localPosition.x + 5) / 5);
+            sensor.AddObservation((transform.localPosition.x - 5) / 5);
+            sensor.AddObservation((transform.localPosition.z + 5) / 5);
+            sensor.AddObservation((transform.localPosition.z - 5) / 5);
 
             if (!IsHardMode) {
                 // Agent velocity
-                AddVectorObs(m_AgentRb.velocity.x / 5);
-                AddVectorObs(m_AgentRb.velocity.z / 5);
+                sensor.AddObservation(m_AgentRb.velocity.x / 5);
+                sensor.AddObservation(m_AgentRb.velocity.z / 5);
             }
         }
 
         public float speed = 10;
 
-        public override void AgentAction(float[] vectorAction) {
+        public override void OnActionReceived(float[] vectorAction) {
             m_ResetParams.SetProperty("force_reset", 0);
 
             // Rewards
@@ -66,7 +68,7 @@ namespace Roller {
 
             if (distanceToTarget < 1.42f) { // Reached target
                 SetReward(1.0f);
-                Done();
+                EndEpisode();
             }
             else { // Time penalty
                 SetReward(-0.01f);
@@ -75,7 +77,7 @@ namespace Roller {
             // Fell off platform
             if (IsOutOfRegion()) {
                 SetReward(-1.0f);
-                Done();
+                EndEpisode();
             }
 
             // Actions, size = 2

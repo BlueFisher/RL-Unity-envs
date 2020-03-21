@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAgents;
+using MLAgents.Sensors;
+using MLAgents.SideChannels;
 
 namespace Ball3D {
     public class Ball3DAgent : Agent {
@@ -9,24 +11,24 @@ namespace Ball3D {
         public GameObject Ball;
         public bool IsHardMode = false;
         private Rigidbody m_BallRb;
-        IFloatProperties m_ResetParams;
+        FloatPropertiesChannel m_ResetParams;
 
-        public override void InitializeAgent() {
+        public override void Initialize() {
             m_BallRb = Ball.GetComponent<Rigidbody>();
             m_ResetParams = Academy.Instance.FloatProperties;
             SetResetParameters();
         }
 
-        public override void CollectObservations() {
-            AddVectorObs(gameObject.transform.rotation.z);
-            AddVectorObs(gameObject.transform.rotation.x);
-            AddVectorObs(Ball.transform.position - gameObject.transform.position);
+        public override void CollectObservations(VectorSensor sensor) {
+            sensor.AddObservation(gameObject.transform.rotation.z);
+            sensor.AddObservation(gameObject.transform.rotation.x);
+            sensor.AddObservation(Ball.transform.position - gameObject.transform.position);
 
             if (!IsHardMode)
-                AddVectorObs(m_BallRb.velocity);
+                sensor.AddObservation(m_BallRb.velocity);
         }
 
-        public override void AgentAction(float[] vectorAction) {
+        public override void OnActionReceived(float[] vectorAction) {
             var actionZ = 2f * Mathf.Clamp(vectorAction[0], -1f, 1f);
             var actionX = 2f * Mathf.Clamp(vectorAction[1], -1f, 1f);
 
@@ -43,14 +45,14 @@ namespace Ball3D {
                 Mathf.Abs(Ball.transform.position.x - gameObject.transform.position.x) > 3f ||
                 Mathf.Abs(Ball.transform.position.z - gameObject.transform.position.z) > 3f) {
                 SetReward(-1f);
-                Done();
+                EndEpisode();
             }
             else {
                 SetReward(0.1f);
             }
         }
 
-        public override void AgentReset() {
+        public override void OnEpisodeBegin() {
             gameObject.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
             gameObject.transform.Rotate(new Vector3(1, 0, 0), Random.Range(-10f, 10f));
             gameObject.transform.Rotate(new Vector3(0, 0, 1), Random.Range(-10f, 10f));
