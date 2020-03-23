@@ -661,7 +661,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    vectorObservationSize: 6
+    vectorObservationSize: 4
     numStackedVectorObservations: 1
     vectorActionSize: 02000000
     vectorActionDescriptions: []
@@ -670,7 +670,7 @@ MonoBehaviour:
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: HardRoller
-  m_TeamID: 0
+  TeamId: 0
   m_UseChildSensors: 1
 --- !u!114 &2092232361
 MonoBehaviour:
@@ -685,7 +685,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DecisionPeriod: 1
-  RepeatAction: 0
+  TakeActionsBetweenDecisions: 0
   offsetStep: 0
 --- !u!1 &2110309520
 GameObject:
@@ -718,7 +718,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AreaPrefab: {fileID: 1663294058}
   CopyGap: 11
-  DefaultCopy: 1
+  DefaultNAgents: 10
 --- !u!4 &2110309522
 Transform:
   m_ObjectHideFlags: 0

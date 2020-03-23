@@ -5,7 +5,7 @@ using System.Linq;
 using MLAgents.Sensors;
 
 namespace RayAgents {
-    public class RayPyramidAgent : Square.SquareAgent {
+    public class RayPyramidAgent : Square.RaySquareAgent {
         public GameObject[] SpawnAreas;
 
         void GenerateTarget(int spawnAreaIndex) {
@@ -34,6 +34,8 @@ namespace RayAgents {
         public override void OnEpisodeBegin() {
             AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
             bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
+            float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
+            ray.rayLength = rayLength;
 
             var enumerable = Enumerable.Range(0, 9).OrderBy(x => System.Guid.NewGuid()).Take(2);
             var items = enumerable.ToArray();
@@ -61,8 +63,8 @@ namespace RayAgents {
 
             // Agent velocity
             var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
-            sensor.AddObservation(velocity.x / 20f);
-            sensor.AddObservation(velocity.z / 20f);
+            sensor.AddObservation(velocity.x);
+            sensor.AddObservation(velocity.z);
         }
     }
 }

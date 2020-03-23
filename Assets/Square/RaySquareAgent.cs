@@ -5,6 +5,20 @@ using UnityEngine;
 
 namespace Square {
     public class RaySquareAgent : SquareAgent {
+        protected RayPerceptionSensorComponent3D ray;
+
+        public override void Initialize() {
+            base.Initialize();
+            ray = GetComponent<RayPerceptionSensorComponent3D>();
+        }
+
+        public override void OnEpisodeBegin() {
+            base.OnEpisodeBegin();
+
+            float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
+            ray.rayLength = rayLength;
+        }
+
         public override void CollectObservations(VectorSensor sensor) {
             m_ResetParams.SetProperty("force_reset", 0);
 
@@ -20,6 +34,7 @@ namespace Square {
             sensor.AddObservation(velocity.x);
             sensor.AddObservation(velocity.z);
         }
-    }
 
+
+    }
 }

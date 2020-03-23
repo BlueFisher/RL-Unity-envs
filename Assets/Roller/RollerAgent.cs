@@ -38,18 +38,11 @@ namespace Roller {
         }
 
         public override void CollectObservations(VectorSensor sensor) {
-            // Calculate relative localPosition
-            Vector3 relativePosition = Target.localPosition - transform.localPosition;
-
-            // Relative localPosition
-            sensor.AddObservation(relativePosition.x / 5);
-            sensor.AddObservation(relativePosition.z / 5);
-
-            // Distance to edges of platform
-            sensor.AddObservation((transform.localPosition.x + 5) / 5);
-            sensor.AddObservation((transform.localPosition.x - 5) / 5);
-            sensor.AddObservation((transform.localPosition.z + 5) / 5);
-            sensor.AddObservation((transform.localPosition.z - 5) / 5);
+            sensor.AddObservation(Target.localPosition.x / 5);
+            sensor.AddObservation(Target.localPosition.z / 5);
+            
+            sensor.AddObservation(transform.localPosition.x / 5);
+            sensor.AddObservation(transform.localPosition.z / 5);
 
             if (!IsHardMode) {
                 // Agent velocity
