@@ -7,8 +7,8 @@ using MLAgents.Sensors;
 
 namespace Roller {
     public class RollerAgent : Agent {
-        Rigidbody m_AgentRb;
-        FloatPropertiesChannel m_ResetParams;
+        protected Rigidbody m_AgentRb;
+        protected FloatPropertiesChannel m_ResetParams;
 
         public Transform Target;
         public bool IsHardMode = false;
@@ -18,7 +18,7 @@ namespace Roller {
             m_ResetParams = Academy.Instance.FloatProperties;
         }
 
-        private bool IsOutOfRegion() {
+        protected bool IsOutOfRegion() {
             return transform.localPosition.x > 5 || transform.localPosition.x < -5
                 || transform.localPosition.z > 5 || transform.localPosition.z < -5;
         }
@@ -38,16 +38,18 @@ namespace Roller {
         }
 
         public override void CollectObservations(VectorSensor sensor) {
-            sensor.AddObservation(Target.localPosition.x / 5);
-            sensor.AddObservation(Target.localPosition.z / 5);
-            
-            sensor.AddObservation(transform.localPosition.x / 5);
-            sensor.AddObservation(transform.localPosition.z / 5);
+            if (sensor != null) {
+                sensor.AddObservation(Target.localPosition.x / 5);
+                sensor.AddObservation(Target.localPosition.z / 5);
 
-            if (!IsHardMode) {
-                // Agent velocity
-                sensor.AddObservation(m_AgentRb.velocity.x / 5);
-                sensor.AddObservation(m_AgentRb.velocity.z / 5);
+                sensor.AddObservation(transform.localPosition.x / 5);
+                sensor.AddObservation(transform.localPosition.z / 5);
+
+                if (!IsHardMode) {
+                    // Agent velocity
+                    sensor.AddObservation(m_AgentRb.velocity.x / 5);
+                    sensor.AddObservation(m_AgentRb.velocity.z / 5);
+                }
             }
         }
 

@@ -9,14 +9,17 @@ EditorBuildSettings:
     path: Assets/InitialScene/InitialScene.unity
     guid: c3f4d99fc7b38c24fb3e690228ac0c4b
   - enabled: 1
-    path: Assets/Roller/Continous/ContinousSimpleRoller.unity
+    path: Assets/Roller/SimpleRoller.unity
     guid: 8bb6592a02e75bc47ad7bf64a0c28d89
   - enabled: 1
-    path: Assets/Roller/Continous/ContinousHardRoller.unity
+    path: Assets/Roller/HardRoller.unity
     guid: b2ef2d0e7aae0e44d9669541e403709a
   - enabled: 1
-    path: Assets/Roller/Continous/ContinousHardStackRoller.unity
+    path: Assets/Roller/HardStackRoller.unity
     guid: 3714c18803dc49a46b86f06d9351384d
+  - enabled: 1
+    path: Assets/Roller/VisualRoller.unity
+    guid: 7ff1e6cd341948a4e9b0d0d10f11f15a
   - enabled: 1
     path: Assets/3DBall/3DBall.unity
     guid: 0e999ea7dddf8784cb921a572c52df13
@@ -30,9 +33,15 @@ EditorBuildSettings:
     path: Assets/Square/RaySquare.unity
     guid: b0fdaa67fced32244a989db2da888e6f
   - enabled: 1
-    path: Assets/Square/RayObstacleSquare.unity
-    guid: 9d44b685960c21e4883afc6d7f9999a9
+    path: Assets/Square/RaySquareFly.unity
+    guid: 89f46b79444f6674798cab602c249cfc
+  - enabled: 1
+    path: Assets/Square/VisualSquareFly.unity
+    guid: b1e3c1836d453d84daef606d06ec34c2
   - enabled: 1
     path: Assets/Pyramid/RayPyramid.unity
     guid: 1ac9f158a6aae3e4884c1b535ba26587
+  - enabled: 1
+    path: Assets/Pyramid/VIsualPyramid.unity
+    guid: 88db9f993a1a6a54da3be15ab6c32132
   m_configObjects: {}

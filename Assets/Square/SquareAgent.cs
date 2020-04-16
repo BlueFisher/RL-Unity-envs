@@ -6,31 +6,24 @@ using MLAgents.Sensors;
 using MLAgents.SideChannels;
 
 namespace Square {
-    public class SquareAgent : Agent {
+    public class BaseSquareAgent : Agent {
         protected Rigidbody m_AgentRb;
         protected Rigidbody m_TargetRb;
         protected FloatPropertiesChannel m_ResetParams;
 
         protected bool wallCollided = false;
         protected bool targetCollided = false;
+        protected RayPerceptionSensorComponent3D[] rays;
 
         public Transform Target;
         public float SpawnRadius = 9;
         public float Speed = 2;
-        public bool AvoidWall = false;
 
         public override void Initialize() {
             m_AgentRb = GetComponent<Rigidbody>();
             m_TargetRb = Target.GetComponent<Rigidbody>();
             m_ResetParams = Academy.Instance.FloatProperties;
-        }
-
-        protected virtual void GenerateAgent() {
-            transform.localPosition = new Vector3(SpawnRadius * (Random.value * 2 - 1),
-                                                        0.5f,
-                                                        SpawnRadius * (Random.value * 2 - 1));
-            transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
-            m_AgentRb.velocity = Vector3.zero;
+            rays = GetComponentsInChildren<RayPerceptionSensorComponent3D>();
         }
 
         protected virtual void GenerateTarget() {
@@ -42,9 +35,43 @@ namespace Square {
             m_TargetRb.angularVelocity = Vector3.zero;
         }
 
+        void OnCollisionEnter(Collision collision) {
+            if (collision.gameObject.CompareTag("wall")) {
+                wallCollided = true;
+            }
+            else if (collision.gameObject.CompareTag("target")) {
+                targetCollided = true;
+            }
+        }
+
+        public override float[] Heuristic() {
+            var action = new float[2];
+
+            action[0] = Input.GetAxis("Vertical");
+            action[1] = Input.GetAxis("Horizontal");
+            return action;
+        }
+    }
+    public class SquareAgent : BaseSquareAgent {
+        public bool AvoidWall = false;
+        public bool TargetObservation = true;
+
+        protected virtual void GenerateAgent() {
+            transform.localPosition = new Vector3(SpawnRadius * (Random.value * 2 - 1),
+                                                        0.5f,
+                                                        SpawnRadius * (Random.value * 2 - 1));
+            transform.rotation = Quaternion.Euler(new Vector3(0f, Random.Range(0, 360)));
+            m_AgentRb.velocity = Vector3.zero;
+        }
+
         public override void OnEpisodeBegin() {
             AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
             bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
+
+            foreach (var ray in rays) {
+                float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
+                ray.rayLength = rayLength;
+            }
 
             // Generate agent
             if (forceReset || (AvoidWall && wallCollided)) {
@@ -57,31 +84,27 @@ namespace Square {
             targetCollided = false;
         }
 
-        void OnCollisionEnter(Collision collision) {
-            if (collision.gameObject.CompareTag("wall")) {
-                wallCollided = true;
-            }
-            else if (collision.gameObject.CompareTag("target")) {
-                targetCollided = true;
-            }
-        }
-
         public override void CollectObservations(VectorSensor sensor) {
             m_ResetParams.SetProperty("force_reset", 0);
 
-            sensor.AddObservation(Target.localPosition.x / 10f);
-            sensor.AddObservation(Target.localPosition.z / 10f);
-            sensor.AddObservation(transform.localPosition.x / 10f);
-            sensor.AddObservation(transform.localPosition.z / 10f);
+            if (sensor != null) {
+                if (TargetObservation) {
+                    sensor.AddObservation(Target.localPosition.x / 10f);
+                    sensor.AddObservation(Target.localPosition.z / 10f);
+                }
 
-            // Agent forward direction
-            sensor.AddObservation(transform.forward.x);
-            sensor.AddObservation(transform.forward.z);
+                sensor.AddObservation(transform.localPosition.x / 10f);
+                sensor.AddObservation(transform.localPosition.z / 10f);
 
-            // Agent velocity
-            var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
-            sensor.AddObservation(velocity.x);
-            sensor.AddObservation(velocity.z);
+                // Agent forward direction
+                sensor.AddObservation(transform.forward.x);
+                sensor.AddObservation(transform.forward.z);
+
+                // Agent velocity
+                var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
+                sensor.AddObservation(velocity.x);
+                sensor.AddObservation(velocity.z);
+            }
         }
 
         public override void OnActionReceived(float[] vectorAction) {
@@ -101,14 +124,6 @@ namespace Square {
             var rotateDir = transform.up * vectorAction[1];
             transform.Rotate(rotateDir, Time.deltaTime * 200f);
             m_AgentRb.AddForce(dirToGo * Speed, ForceMode.VelocityChange);
-        }
-
-        public override float[] Heuristic() {
-            var action = new float[2];
-
-            action[0] = Input.GetAxis("Vertical");
-            action[1] = Input.GetAxis("Horizontal");
-            return action;
         }
     }
 }
