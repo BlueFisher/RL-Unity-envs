@@ -59,17 +59,16 @@ namespace Pyramid {
             m_ResetParams.SetProperty("force_reset", 0);
 
             if (sensor != null) {
-                sensor.AddObservation(transform.localPosition.x / 40f);
-                sensor.AddObservation(transform.localPosition.z / 40f);
-
-                // Agent forward direction
-                sensor.AddObservation(transform.forward.x);
-                sensor.AddObservation(transform.forward.z);
-
                 // Agent velocity
                 var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
                 sensor.AddObservation(velocity.x);
                 sensor.AddObservation(velocity.z);
+
+                sensor.AddObservation(transform.localPosition.x / 40f);
+                sensor.AddObservation(transform.localPosition.z / 40f);
+
+                sensor.AddObservation(Target.localPosition.x / 40f);
+                sensor.AddObservation(Target.localPosition.z / 40f);
             }
         }
 
