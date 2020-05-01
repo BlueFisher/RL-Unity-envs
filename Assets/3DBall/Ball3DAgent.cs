@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
-using MLAgents.Sensors;
-using MLAgents.SideChannels;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.SideChannels;
 
 namespace Ball3D {
     public class Ball3DAgent : Agent {
@@ -11,11 +11,11 @@ namespace Ball3D {
         public GameObject Ball;
         public bool IsHardMode = false;
         private Rigidbody m_BallRb;
-        FloatPropertiesChannel m_ResetParams;
+        EnvironmentParameters m_ResetParams;
 
         public override void Initialize() {
             m_BallRb = Ball.GetComponent<Rigidbody>();
-            m_ResetParams = Academy.Instance.FloatProperties;
+            m_ResetParams = Academy.Instance.EnvironmentParameters;
             SetResetParameters();
         }
 
@@ -63,18 +63,15 @@ namespace Ball3D {
             SetResetParameters();
         }
 
-        public override float[] Heuristic() {
-            var action = new float[2];
-
-            action[0] = -Input.GetAxis("Horizontal");
-            action[1] = Input.GetAxis("Vertical");
-            return action;
+        public override void Heuristic(float[] actionsOut) {
+            actionsOut[0] = -Input.GetAxis("Horizontal");
+            actionsOut[1] = Input.GetAxis("Vertical");
         }
 
         public void SetBall() {
             //Set the attributes of the ball by fetching the information from the academy
-            m_BallRb.mass = m_ResetParams.GetPropertyWithDefault("mass", 1.0f);
-            var scale = m_ResetParams.GetPropertyWithDefault("scale", 1.0f);
+            m_BallRb.mass = m_ResetParams.GetWithDefault("mass", 1.0f);
+            var scale = m_ResetParams.GetWithDefault("scale", 1.0f);
             Ball.transform.localScale = new Vector3(scale, scale, scale);
         }
 

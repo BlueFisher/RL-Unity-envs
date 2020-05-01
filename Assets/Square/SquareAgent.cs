@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 using System.Linq;
-using MLAgents.Sensors;
-using MLAgents.SideChannels;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.SideChannels;
 
 namespace Square {
     public class BaseSquareAgent : Agent {
         protected Rigidbody m_AgentRb;
         protected Rigidbody m_TargetRb;
-        protected FloatPropertiesChannel m_ResetParams;
+        protected EnvironmentParameters m_ResetParams;
+        protected bool forceReset = false;
 
         protected bool wallCollided = false;
         protected bool targetCollided = false;
@@ -22,7 +23,10 @@ namespace Square {
         public override void Initialize() {
             m_AgentRb = GetComponent<Rigidbody>();
             m_TargetRb = Target.GetComponent<Rigidbody>();
-            m_ResetParams = Academy.Instance.FloatProperties;
+            m_ResetParams = Academy.Instance.EnvironmentParameters;
+            m_ResetParams.RegisterCallback("force_reset", v => {
+                forceReset = System.Convert.ToBoolean(v);
+            });
             rays = GetComponentsInChildren<RayPerceptionSensorComponent3D>();
         }
 
@@ -44,14 +48,13 @@ namespace Square {
             }
         }
 
-        public override float[] Heuristic() {
-            var action = new float[2];
-
-            action[0] = Input.GetAxis("Vertical");
-            action[1] = Input.GetAxis("Horizontal");
-            return action;
+        public override void Heuristic(float[] actionsOut) {
+            actionsOut[0] = Input.GetAxis("Horizontal");
+            actionsOut[1] = Input.GetAxis("Vertical");
         }
     }
+
+
     public class SquareAgent : BaseSquareAgent {
         public bool AvoidWall = false;
         public bool TargetObservation = true;
@@ -65,12 +68,11 @@ namespace Square {
         }
 
         public override void OnEpisodeBegin() {
-            AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
-            bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
+            AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
 
             foreach (var ray in rays) {
-                float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
-                ray.rayLength = rayLength;
+                float rayLength = m_ResetParams.GetWithDefault("ray_length", ray.RayLength);
+                ray.RayLength = rayLength;
             }
 
             // Generate agent
@@ -85,7 +87,7 @@ namespace Square {
         }
 
         public override void CollectObservations(VectorSensor sensor) {
-            m_ResetParams.SetProperty("force_reset", 0);
+            forceReset = false;
 
             if (sensor != null) {
                 if (TargetObservation) {
@@ -117,7 +119,7 @@ namespace Square {
                 EndEpisode();
             }
             else {
-                AddReward(-1f / maxStep);
+                AddReward(-1f / MaxStep);
             }
 
             var dirToGo = transform.forward * vectorAction[0];

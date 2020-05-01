@@ -8,14 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using MLAgents.CommunicatorObjects;
-using MLAgents.Sensors;
-using MLAgents.Policies;
-using MLAgents.SideChannels;
-using System.IO;
+using Unity.MLAgents.CommunicatorObjects;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Policies;
+using Unity.MLAgents.SideChannels;
 using Google.Protobuf;
 
-namespace MLAgents
+namespace Unity.MLAgents
 {
     /// Responsible for communication with External using gRPC.
     internal class RpcCommunicator : ICommunicator
@@ -28,7 +27,7 @@ namespace MLAgents
 
         List<string> m_BehaviorNames = new List<string>();
         bool m_NeedCommunicateThisStep;
-        WriteAdapter m_WriteAdapter = new WriteAdapter();
+        ObservationWriter m_ObservationWriter = new ObservationWriter();
         Dictionary<string, SensorShapeValidator> m_SensorShapeValidators = new Dictionary<string, SensorShapeValidator>();
         Dictionary<string, List<int>> m_OrderedAgentsRequestingDecisions = new Dictionary<string, List<int>>();
 
@@ -51,8 +50,6 @@ namespace MLAgents
         /// The communicator parameters sent at construction
         CommunicatorInitParameters m_CommunicatorInitParameters;
 
-        Dictionary<Guid, SideChannel> m_SideChannels = new Dictionary<Guid, SideChannel>();
-
         /// <summary>
         /// Initializes a new instance of the RPCCommunicator class.
         /// </summary>
@@ -63,6 +60,41 @@ namespace MLAgents
         }
 
         #region Initialization
+
+        internal static bool CheckCommunicationVersionsAreCompatible(
+            string unityCommunicationVersion,
+            string pythonApiVersion,
+            string pythonLibraryVersion)
+        {
+            var unityVersion = new Version(unityCommunicationVersion);
+            var pythonVersion = new Version(pythonApiVersion);
+            if (unityVersion.Major == 0)
+            {
+                if (unityVersion.Major != pythonVersion.Major || unityVersion.Minor != pythonVersion.Minor)
+                {
+                    return false;
+                }
+
+            }
+            else if (unityVersion.Major != pythonVersion.Major)
+            {
+                return false;
+            }
+            else if (unityVersion.Minor != pythonVersion.Minor)
+            {
+                // Even if we initialize, we still want to check to make sure that we inform users of minor version
+                // changes.  This will surface any features that may not work due to minor version incompatibilities.
+                Debug.LogWarningFormat(
+                    "WARNING: The communication API versions between Unity and python differ at the minor version level. " +
+                    "Python API: {0}, Unity API: {1} Python Library Version: {2} .\n" +
+                    "This means that some features may not work unless you upgrade the package with the lower version." +
+                    "Please find the versions that work best together from our release page.\n" +
+                    "https://github.com/Unity-Technologies/ml-agents/releases",
+                    pythonApiVersion, unityCommunicationVersion, pythonLibraryVersion
+                );
+            }
+            return true;
+        }
 
         /// <summary>
         /// Sends the initialization parameters through the Communicator.
@@ -76,7 +108,8 @@ namespace MLAgents
             {
                 Name = initParameters.name,
                 PackageVersion = initParameters.unityPackageVersion,
-                CommunicationVersion = initParameters.unityCommunicationVersion
+                CommunicationVersion = initParameters.unityCommunicationVersion,
+                Capabilities = initParameters.CSharpCapabilities.ToProto()
             };
 
             UnityInputProto input;
@@ -90,17 +123,23 @@ namespace MLAgents
                     },
                     out input);
 
+                var pythonCommunicationVersion = initializationInput.RlInitializationInput.CommunicationVersion;
+                var pythonPackageVersion = initializationInput.RlInitializationInput.PackageVersion;
+                var unityCommunicationVersion = initParameters.unityCommunicationVersion;
+
+                var communicationIsCompatible = CheckCommunicationVersionsAreCompatible(unityCommunicationVersion,
+                    pythonCommunicationVersion,
+                    pythonPackageVersion);
+
                 // Initialization succeeded part-way. The most likely cause is a mismatch between the communicator
                 // API strings, so log an explicit warning if that's the case.
                 if (initializationInput != null && input == null)
                 {
-                    var pythonCommunicationVersion = initializationInput.RlInitializationInput.CommunicationVersion;
-                    var pythonPackageVersion = initializationInput.RlInitializationInput.PackageVersion;
-                    if (pythonCommunicationVersion != initParameters.unityCommunicationVersion)
+                    if (!communicationIsCompatible)
                     {
                         Debug.LogWarningFormat(
-                            "Communication protocol between python ({0}) and Unity ({1}) don't match. " +
-                            "Python library version: {2}.",
+                            "Communication protocol between python ({0}) and Unity ({1}) have different " +
+                            "versions which make them incompatible. Python library version: {2}.",
                             pythonCommunicationVersion, initParameters.unityCommunicationVersion,
                             pythonPackageVersion
                         );
@@ -160,7 +199,7 @@ namespace MLAgents
 
         void UpdateEnvironmentWithInput(UnityRLInputProto rlInput)
         {
-            ProcessSideChannelData(m_SideChannels, rlInput.SideChannel.ToArray());
+            SideChannelsManager.ProcessSideChannelData(rlInput.SideChannel.ToArray());
             SendCommandEvent(rlInput.Command);
         }
 
@@ -284,7 +323,7 @@ namespace MLAgents
                 {
                     foreach (var sensor in sensors)
                     {
-                        var obsProto = sensor.GetObservationProto(m_WriteAdapter);
+                        var obsProto = sensor.GetObservationProto(m_ObservationWriter);
                         agentInfoProto.Observations.Add(obsProto);
                     }
                 }
@@ -296,7 +335,10 @@ namespace MLAgents
             {
                 m_OrderedAgentsRequestingDecisions[behaviorName] = new List<int>();
             }
-            m_OrderedAgentsRequestingDecisions[behaviorName].Add(info.episodeId);
+            if (!info.done)
+            {
+                m_OrderedAgentsRequestingDecisions[behaviorName].Add(info.episodeId);
+            }
             if (!m_LastActionsReceived.ContainsKey(behaviorName))
             {
                 m_LastActionsReceived[behaviorName] = new Dictionary<int, float[]>();
@@ -324,7 +366,7 @@ namespace MLAgents
                 message.RlInitializationOutput = tempUnityRlInitializationOutput;
             }
 
-            byte[] messageAggregated = GetSideChannelMessage(m_SideChannels);
+            byte[] messageAggregated = SideChannelsManager.GetSideChannelMessage();
             message.RlOutput.SideChannel = ByteString.CopyFrom(messageAggregated);
 
             var input = Exchange(message);
@@ -458,13 +500,20 @@ namespace MLAgents
             {
                 if (m_CurrentUnityRlOutput.AgentInfos.ContainsKey(behaviorName))
                 {
-                    if (output == null)
+                    if (m_CurrentUnityRlOutput.AgentInfos[behaviorName].CalculateSize() > 0)
                     {
-                        output = new UnityRLInitializationOutputProto();
-                    }
+                        // Only send the BrainParameters if there is a non empty list of
+                        // AgentInfos ready to be sent.
+                        // This is to ensure that The Python side will always have a first
+                        // observation when receiving the BrainParameters
+                        if (output == null)
+                        {
+                            output = new UnityRLInitializationOutputProto();
+                        }
 
-                    var brainParameters = m_UnsentBrainKeys[behaviorName];
-                    output.BrainParameters.Add(brainParameters.ToProto(behaviorName, true));
+                        var brainParameters = m_UnsentBrainKeys[behaviorName];
+                        output.BrainParameters.Add(brainParameters.ToProto(behaviorName, true));
+                    }
                 }
             }
 
@@ -482,166 +531,6 @@ namespace MLAgents
             {
                 m_SentBrainKeys.Add(brainProto.BrainName);
                 m_UnsentBrainKeys.Remove(brainProto.BrainName);
-            }
-        }
-
-        #endregion
-
-
-        #region Handling side channels
-
-        /// <summary>
-        /// Registers a side channel to the communicator. The side channel will exchange
-        /// messages with its Python equivalent.
-        /// </summary>
-        /// <param name="sideChannel"> The side channel to be registered.</param>
-        public void RegisterSideChannel(SideChannel sideChannel)
-        {
-            var channelId = sideChannel.ChannelId;
-            if (m_SideChannels.ContainsKey(channelId))
-            {
-                throw new UnityAgentsException(string.Format(
-                    "A side channel with type index {0} is already registered. You cannot register multiple " +
-                    "side channels of the same id.", channelId));
-            }
-
-            // Process any messages that we've already received for this channel ID.
-            var numMessages = m_CachedMessages.Count;
-            for (int i = 0; i < numMessages; i++)
-            {
-                var cachedMessage = m_CachedMessages.Dequeue();
-                if (channelId == cachedMessage.ChannelId)
-                {
-                    using (var incomingMsg = new IncomingMessage(cachedMessage.Message))
-                    {
-                        sideChannel.OnMessageReceived(incomingMsg);
-                    }
-                }
-                else
-                {
-                    m_CachedMessages.Enqueue(cachedMessage);
-                }
-            }
-            m_SideChannels.Add(channelId, sideChannel);
-        }
-
-        /// <summary>
-        /// Unregisters a side channel from the communicator.
-        /// </summary>
-        /// <param name="sideChannel"> The side channel to be unregistered.</param>
-        public void UnregisterSideChannel(SideChannel sideChannel)
-        {
-            if (m_SideChannels.ContainsKey(sideChannel.ChannelId))
-            {
-                m_SideChannels.Remove(sideChannel.ChannelId);
-            }
-        }
-
-        /// <summary>
-        /// Grabs the messages that the registered side channels will send to Python at the current step
-        /// into a singe byte array.
-        /// </summary>
-        /// <param name="sideChannels"> A dictionary of channel type to channel.</param>
-        /// <returns></returns>
-        public static byte[] GetSideChannelMessage(Dictionary<Guid, SideChannel> sideChannels)
-        {
-            using (var memStream = new MemoryStream())
-            {
-                using (var binaryWriter = new BinaryWriter(memStream))
-                {
-                    foreach (var sideChannel in sideChannels.Values)
-                    {
-                        var messageList = sideChannel.MessageQueue;
-                        foreach (var message in messageList)
-                        {
-                            binaryWriter.Write(sideChannel.ChannelId.ToByteArray());
-                            binaryWriter.Write(message.Count());
-                            binaryWriter.Write(message);
-                        }
-                        sideChannel.MessageQueue.Clear();
-                    }
-                    return memStream.ToArray();
-                }
-            }
-        }
-
-        private struct CachedSideChannelMessage
-        {
-            public Guid ChannelId;
-            public byte[] Message;
-        }
-
-        private static Queue<CachedSideChannelMessage> m_CachedMessages = new Queue<CachedSideChannelMessage>();
-
-        /// <summary>
-        /// Separates the data received from Python into individual messages for each registered side channel.
-        /// </summary>
-        /// <param name="sideChannels">A dictionary of channel type to channel.</param>
-        /// <param name="dataReceived">The byte array of data received from Python.</param>
-        public static void ProcessSideChannelData(Dictionary<Guid, SideChannel> sideChannels, byte[] dataReceived)
-        {
-            while (m_CachedMessages.Count != 0)
-            {
-                var cachedMessage = m_CachedMessages.Dequeue();
-                if (sideChannels.ContainsKey(cachedMessage.ChannelId))
-                {
-                    using (var incomingMsg = new IncomingMessage(cachedMessage.Message))
-                    {
-                        sideChannels[cachedMessage.ChannelId].OnMessageReceived(incomingMsg);
-                    }
-                }
-                else
-                {
-                    Debug.Log(string.Format(
-                        "Unknown side channel data received. Channel Id is "
-                        + ": {0}", cachedMessage.ChannelId));
-                }
-            }
-
-            if (dataReceived.Length == 0)
-            {
-                return;
-            }
-            using (var memStream = new MemoryStream(dataReceived))
-            {
-                using (var binaryReader = new BinaryReader(memStream))
-                {
-                    while (memStream.Position < memStream.Length)
-                    {
-                        Guid channelId = Guid.Empty;
-                        byte[] message = null;
-                        try
-                        {
-                            channelId = new Guid(binaryReader.ReadBytes(16));
-                            var messageLength = binaryReader.ReadInt32();
-                            message = binaryReader.ReadBytes(messageLength);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new UnityAgentsException(
-                                "There was a problem reading a message in a SideChannel. Please make sure the " +
-                                "version of MLAgents in Unity is compatible with the Python version. Original error : "
-                                + ex.Message);
-                        }
-                        if (sideChannels.ContainsKey(channelId))
-                        {
-                            using (var incomingMsg = new IncomingMessage(message))
-                            {
-                                sideChannels[channelId].OnMessageReceived(incomingMsg);
-                            }
-                        }
-                        else
-                        {
-                            // Don't recognize this ID, but cache it in case the SideChannel that can handle
-                            // it is registered before the next call to ProcessSideChannelData.
-                            m_CachedMessages.Enqueue(new CachedSideChannelMessage
-                            {
-                                ChannelId = channelId,
-                                Message = message
-                            });
-                        }
-                    }
-                }
             }
         }
 

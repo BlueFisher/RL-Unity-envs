@@ -1,16 +1,15 @@
 using NUnit.Framework;
 using UnityEngine;
-using MLAgents;
-using MLAgents.Policies;
+using Unity.MLAgents.Policies;
 
-namespace MLAgents.Tests
+namespace Unity.MLAgents.Tests
 {
     [TestFixture]
     public class BehaviorParameterTests
     {
-        static float[] DummyHeuristic()
+        static void DummyHeuristic(float[] actionsOut)
         {
-            return null;
+            // No-op
         }
 
         [Test]
@@ -18,7 +17,7 @@ namespace MLAgents.Tests
         {
             var gameObj = new GameObject();
             var bp = gameObj.AddComponent<BehaviorParameters>();
-            bp.behaviorType = BehaviorType.InferenceOnly;
+            bp.BehaviorType = BehaviorType.InferenceOnly;
 
             Assert.Throws<UnityAgentsException>(() =>
             {

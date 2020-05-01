@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAgents.Sensors;
+using Unity.MLAgents.Sensors;
 
 namespace Square {
     public class SquareFlyAgent : BaseSquareAgent {
@@ -19,11 +19,9 @@ namespace Square {
         }
 
         public override void OnEpisodeBegin() {
-            bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
-
             foreach (var ray in rays) {
-                float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
-                ray.rayLength = rayLength;
+                float rayLength = m_ResetParams.GetWithDefault("ray_length", ray.RayLength);
+                ray.RayLength = rayLength;
             }
 
             if (forceReset || IsAgentOut()) {
@@ -34,20 +32,19 @@ namespace Square {
         }
 
         public override void CollectObservations(VectorSensor sensor) {
-            m_ResetParams.SetProperty("force_reset", 0);
+            forceReset = false;
 
             if (sensor != null) {
-                sensor.AddObservation(transform.localPosition.x / 10f);
-                sensor.AddObservation(transform.localPosition.z / 10f);
-
-                // Agent forward direction
-                sensor.AddObservation(transform.forward.x);
-                sensor.AddObservation(transform.forward.z);
-
                 // Agent velocity
                 var velocity = transform.InverseTransformDirection(m_AgentRb.velocity);
                 sensor.AddObservation(velocity.x);
                 sensor.AddObservation(velocity.z);
+
+                sensor.AddObservation(transform.localPosition.x / 10f);
+                sensor.AddObservation(transform.localPosition.z / 10f);
+
+                sensor.AddObservation(Target.localPosition.x / 10f);
+                sensor.AddObservation(Target.localPosition.z / 10f);
             }
         }
 
@@ -62,7 +59,7 @@ namespace Square {
                 EndEpisode();
             }
             else {
-                AddReward(-1f / maxStep);
+                AddReward(-1f / MaxStep);
             }
 
             var dirToGo = transform.forward * vectorAction[0];

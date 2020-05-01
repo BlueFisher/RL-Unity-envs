@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 using System.Linq;
-using MLAgents.Sensors;
+using Unity.MLAgents.Sensors;
 
 namespace Pyramid {
     public class PyramidAgent : Square.BaseSquareAgent {
@@ -33,12 +33,11 @@ namespace Pyramid {
         }
 
         public override void OnEpisodeBegin() {
-            AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
-            bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
+            AvoidWall = System.Convert.ToBoolean(m_ResetParams.GetWithDefault("avoid_wall", System.Convert.ToSingle(AvoidWall)));
 
             foreach (var ray in rays) {
-                float rayLength = m_ResetParams.GetPropertyWithDefault("ray_length", ray.rayLength);
-                ray.rayLength = rayLength;
+                float rayLength = m_ResetParams.GetWithDefault("ray_length", ray.RayLength);
+                ray.RayLength = rayLength;
             }
 
             var enumerable = Enumerable.Range(0, 9).OrderBy(x => System.Guid.NewGuid()).Take(2);
@@ -56,7 +55,7 @@ namespace Pyramid {
         }
 
         public override void CollectObservations(VectorSensor sensor) {
-            m_ResetParams.SetProperty("force_reset", 0);
+            forceReset = false;
 
             if (sensor != null) {
                 // Agent velocity
@@ -82,7 +81,7 @@ namespace Pyramid {
                 EndEpisode();
             }
             else {
-                AddReward(-1f / maxStep);
+                AddReward(-1f / MaxStep);
             }
 
             var dirToGo = transform.forward * vectorAction[0];

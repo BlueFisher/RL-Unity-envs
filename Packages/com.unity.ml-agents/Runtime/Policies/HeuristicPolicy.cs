@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System;
 using System.Collections;
-using MLAgents.Sensors;
+using Unity.MLAgents.Sensors;
 
-namespace MLAgents.Policies
+namespace Unity.MLAgents.Policies
 {
     /// <summary>
     /// The Heuristic Policy uses a hards coded Heuristic method
@@ -12,29 +12,40 @@ namespace MLAgents.Policies
     /// </summary>
     internal class HeuristicPolicy : IPolicy
     {
-        Func<float[]> m_Heuristic;
+        public delegate void ActionGenerator(float[] actionsOut);
+        ActionGenerator m_Heuristic;
         float[] m_LastDecision;
+        bool m_Done;
+        bool m_DecisionRequested;
 
-        WriteAdapter m_WriteAdapter = new WriteAdapter();
+        ObservationWriter m_ObservationWriter = new ObservationWriter();
         NullList m_NullList = new NullList();
 
 
         /// <inheritdoc />
-        public HeuristicPolicy(Func<float[]> heuristic)
+        public HeuristicPolicy(ActionGenerator heuristic, int numActions)
         {
             m_Heuristic = heuristic;
+            m_LastDecision = new float[numActions];
         }
 
         /// <inheritdoc />
         public void RequestDecision(AgentInfo info, List<ISensor> sensors)
         {
             StepSensors(sensors);
-            m_LastDecision = m_Heuristic.Invoke();
+            m_Done = info.done;
+            m_DecisionRequested = true;
+
         }
 
         /// <inheritdoc />
         public float[] DecideAction()
         {
+            if (!m_Done && m_DecisionRequested)
+            {
+                 m_Heuristic.Invoke(m_LastDecision);
+            }
+            m_DecisionRequested = false;
             return m_LastDecision;
         }
 
@@ -115,8 +126,8 @@ namespace MLAgents.Policies
             {
                 if (sensor.GetCompressionType() == SensorCompressionType.None)
                 {
-                    m_WriteAdapter.SetTarget(m_NullList, sensor.GetObservationShape(), 0);
-                    sensor.Write(m_WriteAdapter);
+                    m_ObservationWriter.SetTarget(m_NullList, sensor.GetObservationShape(), 0);
+                    sensor.Write(m_ObservationWriter);
                 }
                 else
                 {

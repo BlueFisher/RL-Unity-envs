@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 using System.Linq;
-using MLAgents.SideChannels;
-using MLAgents.Sensors;
+using Unity.MLAgents.SideChannels;
+using Unity.MLAgents.Sensors;
 
 namespace Roller {
     public class RollerVisualAgent : RollerAgent {

@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using MLAgents;
-using MLAgents.Sensors;
-using MLAgents.SideChannels;
+using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
 
 public class TennisAgent : Agent
 {
@@ -18,7 +17,7 @@ public class TennisAgent : Agent
     Rigidbody m_AgentRb;
     Rigidbody m_BallRb;
     float m_InvertMult;
-    FloatPropertiesChannel m_ResetParams;
+    EnvironmentParameters m_ResetParams;
 
     // Looks for the scoreboard based on the name of the gameObjects.
     // Do not modify the names of the Score GameObjects
@@ -32,7 +31,7 @@ public class TennisAgent : Agent
         m_BallRb = ball.GetComponent<Rigidbody>();
         var canvas = GameObject.Find(k_CanvasName);
         GameObject scoreBoard;
-        m_ResetParams = Academy.Instance.FloatProperties;
+        m_ResetParams = Academy.Instance.EnvironmentParameters;
         if (invertX)
         {
             scoreBoard = canvas.transform.Find(k_ScoreBoardBName).gameObject;
@@ -86,13 +85,11 @@ public class TennisAgent : Agent
         m_TextComponent.text = score.ToString();
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(float[] actionsOut)
     {
-        var action = new float[2];
-
-        action[0] = Input.GetAxis("Horizontal");
-        action[1] = Input.GetKey(KeyCode.Space) ? 1f : 0f;
-        return action;
+        actionsOut[0] = Input.GetAxis("Horizontal");    // Racket Movement
+        actionsOut[1] = Input.GetKey(KeyCode.Space) ? 1f : 0f;   // Racket Jumping
+        actionsOut[2] = Input.GetAxis("Vertical");   // Racket Rotation
     }
 
     public override void OnEpisodeBegin()
@@ -107,7 +104,7 @@ public class TennisAgent : Agent
 
     public void SetRacket()
     {
-        angle = m_ResetParams.GetPropertyWithDefault("angle", 55);
+        angle = m_ResetParams.GetWithDefault("angle", 55);
         gameObject.transform.eulerAngles = new Vector3(
             gameObject.transform.eulerAngles.x,
             gameObject.transform.eulerAngles.y,
@@ -117,7 +114,7 @@ public class TennisAgent : Agent
 
     public void SetBall()
     {
-        scale = m_ResetParams.GetPropertyWithDefault("scale", .5f);
+        scale = m_ResetParams.GetWithDefault("scale", .5f);
         ball.transform.localScale = new Vector3(scale, scale, scale);
     }
 

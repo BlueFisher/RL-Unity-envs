@@ -1,21 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using Unity.MLAgents;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.SideChannels;
 using UnityEngine;
-using MLAgents;
-using System.Linq;
-using MLAgents.SideChannels;
-using MLAgents.Sensors;
 
 namespace Roller {
     public class RollerAgent : Agent {
         protected Rigidbody m_AgentRb;
-        protected FloatPropertiesChannel m_ResetParams;
+        protected EnvironmentParameters m_ResetParams;
+
+        private bool forceReset = false;
 
         public Transform Target;
         public bool IsHardMode = false;
 
         public override void Initialize() {
             m_AgentRb = GetComponent<Rigidbody>();
-            m_ResetParams = Academy.Instance.FloatProperties;
+            m_ResetParams = Academy.Instance.EnvironmentParameters;
+            m_ResetParams.RegisterCallback("force_reset", v => {
+                forceReset = System.Convert.ToBoolean(v);
+            });
         }
 
         protected bool IsOutOfRegion() {
@@ -24,8 +27,6 @@ namespace Roller {
         }
 
         public override void OnEpisodeBegin() {
-            bool forceReset = System.Convert.ToBoolean(m_ResetParams.GetPropertyWithDefault("force_reset", 0));
-
             if (forceReset || IsOutOfRegion()) {
                 transform.localPosition = new Vector3(0, 0.5f, 0);
                 m_AgentRb.angularVelocity = Vector3.zero;
@@ -56,7 +57,7 @@ namespace Roller {
         public float speed = 10;
 
         public override void OnActionReceived(float[] vectorAction) {
-            m_ResetParams.SetProperty("force_reset", 0);
+            forceReset = false;
 
             // Rewards
             float distanceToTarget = Vector3.Distance(transform.localPosition, Target.localPosition);
@@ -82,12 +83,10 @@ namespace Roller {
             m_AgentRb.AddForce(controlSignal * speed);
         }
 
-        public override float[] Heuristic() {
-            var action = new float[2];
 
-            action[0] = Input.GetAxis("Horizontal");
-            action[1] = Input.GetAxis("Vertical");
-            return action;
+        public override void Heuristic(float[] actionsOut) {
+            actionsOut[0] = Input.GetAxis("Horizontal");
+            actionsOut[1] = Input.GetAxis("Vertical");
         }
     }
 }

@@ -1,16 +1,24 @@
-using System.CodeDom;
+using System;
 using UnityEngine;
 using NUnit.Framework;
 using System.Reflection;
 using System.Collections.Generic;
-using MLAgents.Sensors;
-using MLAgents.Policies;
+using Unity.MLAgents.Sensors;
+using Unity.MLAgents.Policies;
+using Unity.MLAgents.SideChannels;
 
-namespace MLAgents.Tests
+namespace Unity.MLAgents.Tests
 {
     internal class TestPolicy : IPolicy
     {
-        public void RequestDecision(AgentInfo info, List<ISensor> sensors) {}
+        public Action OnRequestDecision;
+        ObservationWriter m_ObsWriter = new ObservationWriter();
+        public void RequestDecision(AgentInfo info, List<ISensor> sensors) {
+            foreach(var sensor in sensors){
+                sensor.GetObservationProto(m_ObsWriter);
+            }
+            OnRequestDecision?.Invoke();
+        }
 
         public float[] DecideAction() { return new float[0]; }
 
@@ -68,7 +76,7 @@ namespace MLAgents.Tests
         {
             collectObservationsCalls += 1;
             collectObservationsCallsForEpisode += 1;
-            sensor.AddObservation(0f);
+            sensor.AddObservation(collectObservationsCallsForEpisode);
         }
 
         public override void OnActionReceived(float[] vectorAction)
@@ -85,10 +93,11 @@ namespace MLAgents.Tests
             agentActionCallsForEpisode = 0;
         }
 
-        public override float[] Heuristic()
+        public override void Heuristic(float[] actionsOut)
         {
+            var obs = GetObservations();
+            actionsOut[0] = obs[0];
             heuristicCalls++;
-            return new float[0];
         }
     }
 
@@ -97,6 +106,7 @@ namespace MLAgents.Tests
         public string sensorName;
         public int numWriteCalls;
         public int numCompressedCalls;
+        public int numResetCalls;
         public SensorCompressionType compressionType = SensorCompressionType.None;
 
         public TestSensor(string n)
@@ -109,7 +119,7 @@ namespace MLAgents.Tests
             return new[] { 0 };
         }
 
-        public int Write(WriteAdapter adapter)
+        public int Write(ObservationWriter writer)
         {
             numWriteCalls++;
             // No-op
@@ -133,6 +143,11 @@ namespace MLAgents.Tests
         }
 
         public void Update() {}
+
+        public void Reset()
+        {
+            numResetCalls++;
+        }
     }
 
     [TestFixture]
@@ -194,7 +209,9 @@ namespace MLAgents.Tests
             Assert.AreEqual(0, aca.EpisodeCount);
             Assert.AreEqual(0, aca.StepCount);
             Assert.AreEqual(0, aca.TotalStepCount);
-            Assert.AreNotEqual(null, aca.FloatProperties);
+            Assert.AreNotEqual(null, SideChannelsManager.GetSideChannel<EnvironmentParametersChannel>());
+            Assert.AreNotEqual(null, SideChannelsManager.GetSideChannel<EngineConfigurationChannel>());
+            Assert.AreNotEqual(null, SideChannelsManager.GetSideChannel<StatsSideChannel>());
 
             // Check that Dispose is idempotent
             aca.Dispose();
@@ -205,13 +222,20 @@ namespace MLAgents.Tests
         [Test]
         public void TestAcademyDispose()
         {
-            var floatProperties1 = Academy.Instance.FloatProperties;
+            var envParams1 = SideChannelsManager.GetSideChannel<EnvironmentParametersChannel>();
+            var engineParams1 = SideChannelsManager.GetSideChannel<EngineConfigurationChannel>();
+            var statsParams1 = SideChannelsManager.GetSideChannel<StatsSideChannel>();
             Academy.Instance.Dispose();
 
-            var floatProperties2 = Academy.Instance.FloatProperties;
+            Academy.Instance.LazyInitialize();
+            var envParams2 = SideChannelsManager.GetSideChannel<EnvironmentParametersChannel>();
+            var engineParams2 = SideChannelsManager.GetSideChannel<EngineConfigurationChannel>();
+            var statsParams2 = SideChannelsManager.GetSideChannel<StatsSideChannel>();
             Academy.Instance.Dispose();
 
-            Assert.AreNotEqual(floatProperties1, floatProperties2);
+            Assert.AreNotEqual(envParams1, envParams2);
+            Assert.AreNotEqual(engineParams1, engineParams2);
+            Assert.AreNotEqual(statsParams1, statsParams2);
         }
 
         [Test]
@@ -478,6 +502,40 @@ namespace MLAgents.Tests
                 aca.EnvironmentStep();
             }
         }
+
+        [Test]
+        public void AssertStackingReset()
+        {
+            var agentGo1 = new GameObject("TestAgent");
+            agentGo1.AddComponent<TestAgent>();
+            var behaviorParameters = agentGo1.GetComponent<BehaviorParameters>();
+            behaviorParameters.BrainParameters.NumStackedVectorObservations = 3;
+            var agent1 = agentGo1.GetComponent<TestAgent>();
+            var aca = Academy.Instance;
+            agent1.LazyInitialize();
+            var policy = new TestPolicy();
+            agent1.SetPolicy(policy);
+
+            StackingSensor sensor = null;
+            foreach(ISensor s in agent1.sensors){
+                if (s is  StackingSensor){
+                    sensor = s as StackingSensor;
+                }
+            }
+
+            Assert.NotNull(sensor);
+
+            for (int i = 0; i < 20; i++)
+            {
+                agent1.RequestDecision();
+                aca.EnvironmentStep();
+
+            }
+
+            policy.OnRequestDecision = () =>  SensorTestHelper.CompareObservation(sensor, new[] {18f, 19f, 21f});
+            agent1.EndEpisode();
+            SensorTestHelper.CompareObservation(sensor, new[] {0f, 0f, 0f});
+        }
     }
 
     [TestFixture]
@@ -508,7 +566,7 @@ namespace MLAgents.Tests
             decisionRequester.Awake();
 
 
-            agent1.maxStep = 20;
+            agent1.MaxStep = 20;
 
             agent2.LazyInitialize();
             agent1.LazyInitialize();
@@ -519,7 +577,7 @@ namespace MLAgents.Tests
             for (var i = 0; i < 50; i++)
             {
                 expectedAgent1ActionForEpisode += 1;
-                if (expectedAgent1ActionForEpisode == agent1.maxStep || i == 0)
+                if (expectedAgent1ActionForEpisode == agent1.MaxStep || i == 0)
                 {
                     expectedAgent1ActionForEpisode = 0;
                 }
@@ -545,7 +603,7 @@ namespace MLAgents.Tests
             decisionRequester.Awake();
 
             const int maxStep = 6;
-            agent1.maxStep = maxStep;
+            agent1.MaxStep = maxStep;
             agent1.LazyInitialize();
 
             var expectedAgentStepCount = 0;
@@ -554,6 +612,8 @@ namespace MLAgents.Tests
             var expectedAgentActionForEpisode = 0;
             var expectedCollectObsCalls = 0;
             var expectedCollectObsCallsForEpisode = 0;
+            var expectedCompletedEpisodes = 0;
+            var expectedSensorResetCalls = 0;
 
             for (var i = 0; i < 15; i++)
             {
@@ -575,6 +635,9 @@ namespace MLAgents.Tests
                     expectedAgentActionForEpisode = 0;
                     expectedCollectObsCallsForEpisode = 0;
                     expectedAgentStepCount = 0;
+                    expectedCompletedEpisodes++;
+                    expectedSensorResetCalls++;
+                    expectedCollectObsCalls += 1;
                 }
                 aca.EnvironmentStep();
 
@@ -584,6 +647,8 @@ namespace MLAgents.Tests
                 Assert.AreEqual(expectedAgentActionForEpisode, agent1.agentActionCallsForEpisode);
                 Assert.AreEqual(expectedCollectObsCalls, agent1.collectObservationsCalls);
                 Assert.AreEqual(expectedCollectObsCallsForEpisode, agent1.collectObservationsCallsForEpisode);
+                Assert.AreEqual(expectedCompletedEpisodes, agent1.CompletedEpisodes);
+                Assert.AreEqual(expectedSensorResetCalls, agent1.sensor1.numResetCalls);
             }
         }
 
@@ -611,6 +676,9 @@ namespace MLAgents.Tests
             Assert.AreEqual(numSteps, agent1.heuristicCalls);
             Assert.AreEqual(numSteps, agent1.sensor1.numWriteCalls);
             Assert.AreEqual(numSteps, agent1.sensor2.numCompressedCalls);
+
+            // Make sure the Heuristic method read the observation and set the action
+            Assert.AreEqual(agent1.collectObservationsCallsForEpisode, agent1.GetAction()[0]);
         }
     }
 

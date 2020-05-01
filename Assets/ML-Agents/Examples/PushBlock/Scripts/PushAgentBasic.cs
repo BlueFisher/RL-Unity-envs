@@ -2,7 +2,7 @@
 
 using System.Collections;
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 
 public class PushAgentBasic : Agent
 {
@@ -48,6 +48,8 @@ public class PushAgentBasic : Agent
     /// </summary>
     Renderer m_GroundRenderer;
 
+    EnvironmentParameters m_ResetParams;
+
     void Awake()
     {
         m_PushBlockSettings = FindObjectOfType<PushBlockSettings>();
@@ -68,6 +70,8 @@ public class PushAgentBasic : Agent
         m_GroundRenderer = ground.GetComponent<Renderer>();
         // Starting material
         m_GroundMaterial = m_GroundRenderer.material;
+
+        m_ResetParams = Academy.Instance.EnvironmentParameters;
 
         SetResetParameters();
     }
@@ -166,28 +170,28 @@ public class PushAgentBasic : Agent
         MoveAgent(vectorAction);
 
         // Penalty given each step to encourage agent to finish task quickly.
-        AddReward(-1f / maxStep);
+        AddReward(-1f / MaxStep);
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(float[] actionsOut)
     {
+        actionsOut[0] = 0;
         if (Input.GetKey(KeyCode.D))
         {
-            return new float[] { 3 };
+            actionsOut[0] = 3;
         }
-        if (Input.GetKey(KeyCode.W))
+        else if (Input.GetKey(KeyCode.W))
         {
-            return new float[] { 1 };
+            actionsOut[0] = 1;
         }
-        if (Input.GetKey(KeyCode.A))
+        else if (Input.GetKey(KeyCode.A))
         {
-            return new float[] { 4 };
+            actionsOut[0] = 4;
         }
-        if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S))
         {
-            return new float[] { 2 };
+            actionsOut[0] = 2;
         }
-        return new float[] { 0 };
     }
 
     /// <summary>
@@ -225,27 +229,23 @@ public class PushAgentBasic : Agent
 
     public void SetGroundMaterialFriction()
     {
-        var resetParams = Academy.Instance.FloatProperties;
-
         var groundCollider = ground.GetComponent<Collider>();
 
-        groundCollider.material.dynamicFriction = resetParams.GetPropertyWithDefault("dynamic_friction", 0);
-        groundCollider.material.staticFriction = resetParams.GetPropertyWithDefault("static_friction", 0);
+        groundCollider.material.dynamicFriction = m_ResetParams.GetWithDefault("dynamic_friction", 0);
+        groundCollider.material.staticFriction = m_ResetParams.GetWithDefault("static_friction", 0);
     }
 
     public void SetBlockProperties()
     {
-        var resetParams = Academy.Instance.FloatProperties;
-
-        var scale = resetParams.GetPropertyWithDefault("block_scale", 2);
+        var scale = m_ResetParams.GetWithDefault("block_scale", 2);
         //Set the scale of the block
         m_BlockRb.transform.localScale = new Vector3(scale, 0.75f, scale);
 
         // Set the drag of the block
-        m_BlockRb.drag = resetParams.GetPropertyWithDefault("block_drag", 0.5f);
+        m_BlockRb.drag = m_ResetParams.GetWithDefault("block_drag", 0.5f);
     }
 
-    public void SetResetParameters()
+    void SetResetParameters()
     {
         SetGroundMaterialFriction();
         SetBlockProperties();

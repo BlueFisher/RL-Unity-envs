@@ -1,8 +1,14 @@
 using UnityEngine;
-using MLAgents;
+using Unity.MLAgents;
 
-namespace MLAgentsExamples
+namespace Unity.MLAgentsExamples
 {
+    /// <summary>
+    /// A helper class for the ML-Agents example scenes to override various
+    /// global settings, and restore them afterwards.
+    /// This can modify some Physics and time-stepping properties, so you
+    /// shouldn't copy it into your project unless you know what you're doing.
+    /// </summary>
     public class ProjectSettingsOverrides : MonoBehaviour
     {
         // Original values
@@ -42,7 +48,8 @@ namespace MLAgentsExamples
             Physics.defaultSolverIterations = solverIterations;
             Physics.defaultSolverVelocityIterations = solverVelocityIterations;
 
-            Academy.Instance.FloatProperties.RegisterCallback("gravity", f => { Physics.gravity = new Vector3(0, -f, 0); });
+            // Make sure the Academy singleton is initialized first, since it will create the SideChannels.
+            Academy.Instance.EnvironmentParameters.RegisterCallback("gravity", f => { Physics.gravity = new Vector3(0, -f, 0); });
         }
 
         public void OnDestroy()

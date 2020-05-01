@@ -1,8 +1,7 @@
 using System;
 using UnityEngine;
 using System.Linq;
-using MLAgents;
-using MLAgents.Sensors;
+using Unity.MLAgents;
 using UnityEngine.Serialization;
 
 public class GridAgent : Agent
@@ -28,6 +27,13 @@ public class GridAgent : Agent
     const int k_Left = 3;
     const int k_Right = 4;
 
+    EnvironmentParameters m_ResetParams;
+
+    public override void Initialize()
+    {
+        m_ResetParams = Academy.Instance.EnvironmentParameters;
+    }
+
     public override void CollectDiscreteActionMasks(DiscreteActionMasker actionMasker)
     {
         // Mask the necessary actions if selected by the user.
@@ -36,26 +42,26 @@ public class GridAgent : Agent
            // Prevents the agent from picking an action that would make it collide with a wall
             var positionX = (int)transform.position.x;
             var positionZ = (int)transform.position.z;
-            var maxPosition = (int)Academy.Instance.FloatProperties.GetPropertyWithDefault("gridSize", 5f) - 1;
+            var maxPosition = (int)m_ResetParams.GetWithDefault("gridSize", 5f) - 1;
 
             if (positionX == 0)
             {
-                actionMasker.SetMask(0, new int[]{ k_Left});
+                actionMasker.SetMask(0, new []{ k_Left});
             }
 
             if (positionX == maxPosition)
             {
-                actionMasker.SetMask(0, new int[]{k_Right});
+                actionMasker.SetMask(0, new []{k_Right});
             }
 
             if (positionZ == 0)
             {
-                actionMasker.SetMask(0, new int[]{k_Down});
+                actionMasker.SetMask(0, new []{k_Down});
             }
 
             if (positionZ == maxPosition)
             {
-                actionMasker.SetMask(0, new int[]{k_Up});
+                actionMasker.SetMask(0, new []{k_Up});
             }
         }
     }
@@ -107,25 +113,25 @@ public class GridAgent : Agent
         }
     }
 
-    public override float[] Heuristic()
+    public override void Heuristic(float[] actionsOut)
     {
+        actionsOut[0] = k_NoAction;
         if (Input.GetKey(KeyCode.D))
         {
-            return new float[] { k_Right };
+            actionsOut[0] = k_Right;
         }
         if (Input.GetKey(KeyCode.W))
         {
-            return new float[] { k_Up };
+            actionsOut[0] = k_Up;
         }
         if (Input.GetKey(KeyCode.A))
         {
-            return new float[] { k_Left };
+            actionsOut[0] = k_Left;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            return new float[] { k_Down };
+            actionsOut[0] = k_Down;
         }
-        return new float[] { k_NoAction };
     }
 
     // to be implemented by the developer
