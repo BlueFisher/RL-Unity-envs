@@ -1273,15 +1273,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    vectorObservationSize: 6
-    numStackedVectorObservations: 1
-    vectorActionSize: 02000000
-    vectorActionDescriptions: []
-    vectorActionSpaceType: 1
+    VectorObservationSize: 6
+    NumStackedVectorObservations: 1
+    VectorActionSize: 02000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
   m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: RayPyramid
+  m_BehaviorName: VIsualPyramid
   TeamId: 0
   m_UseChildSensors: 1
 --- !u!114 &592820707589832675
@@ -2270,12 +2270,11 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  maxStep: 5000
+  MaxStep: 5000
   Target: {fileID: 1250302950}
   SpawnRadius: 9
   Speed: 2
   AvoidWall: 0
-  TargetObservation: 1
   SpawnAreas:
   - {fileID: 696217812947826457}
   - {fileID: 696485349788267035}
@@ -3826,4 +3825,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DecisionPeriod: 5
   TakeActionsBetweenDecisions: 1
-  offsetStep: 0
